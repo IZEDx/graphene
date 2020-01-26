@@ -1,0 +1,30 @@
+{
+  "name": "graphene-cms",
+  "scripts": {
+    "bootstrap": "npx lerna bootstrap",
+    "build": "npm run bootstrap && npx lerna run build",
+    "build:api": "cd ./packages/api && npm run build",
+    "build:ui": "cd ./packages/ui && npm run build",
+    "dev": "npm run bootstrap && (npm run dev:ui & npm run dev:api)",
+    "dev:api": "cd ./packages/api && npm run dev",
+    "dev:ui": "cd ./packages/ui && npm run dev",
+    "test": "npx lerna run test",
+    "start": "npm run && node bin/server.js",
+    "typesync": "npx typesync"
+  },
+  "devDependencies": {
+    "@stencil/core": "latest",
+    "@stencil/router": "latest",
+    "@stencil/sass": "latest",
+    "bulma": "latest",
+    "chalk": "latest",
+    "cross-env": "latest",
+    "lerna": "latest",
+    "parcel": "latest",
+    "rollup-plugin-node-polyfills": "^0.2.1",
+    "stencil-quantum": "alpha",
+    "typescript": "latest",
+    "typesync": "latest"
+  },
+  "dependencies": {}
+}
