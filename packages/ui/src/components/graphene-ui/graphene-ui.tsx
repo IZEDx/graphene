@@ -50,6 +50,13 @@ export class GrapheneUI
         this.breadcrumb = this.breadcrumb.slice(0, this.breadcrumb.length - 1);
     }
 
+    @Listen("clearBreadcrumb")
+    onClearBreadcrumb()
+    {
+        this.breadcrumb = [this.breadcrumb[0]];
+        console.log(this.breadcrumb);
+    }
+
     @Listen("pageLeave")
     onPageLeave(page: any)
     {
@@ -84,12 +91,13 @@ export class GrapheneUI
                             </div>
                         </nav>
 
-                        <div class="body box is-fullheight">
+                        <div class="body box is-fullheight has-blur-background">
                             <stencil-router onClick={() => {
                                 this.isExpanded = false;
                             }}>
                                 <stencil-route-switch scrollTopOffset={0}>
-                                    <stencil-route url="/list/:name" component="view-list" routeRender={routeListener} />
+                                    <stencil-route url="/:name/:id" component="view-edit" routeRender={routeListener} />
+                                    <stencil-route url="/:name" component="view-list" routeRender={routeListener} />
                                     <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
                                 </stencil-route-switch>
                             </stencil-router>

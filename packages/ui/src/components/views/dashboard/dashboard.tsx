@@ -23,10 +23,8 @@ export class DashboardView
     render()
     {
         console.log();
-        return <div class="box is-fullheight">
-            <div class="content">
-                <h1>Welcome to Graphene</h1>
-            </div>
+        return <div class="content">
+            <h1>Welcome to Graphene</h1>
         </div>;
     }
 } 

@@ -41,6 +41,8 @@ export namespace Components {
   }
   interface GelTable {
     'columns': string[];
+    'history': RouterHistory;
+    'linkTo'?: (row: any, idx: number) => any;
     'rows': any[];
   }
   interface GrapheneNav {}
@@ -52,6 +54,9 @@ export namespace Components {
     'props': RouteRenderProps | undefined;
   }
   interface ViewDashboard {}
+  interface ViewEdit {
+    'match': MatchResults;
+  }
   interface ViewList {
     'columnCount': number;
     'match': MatchResults;
@@ -103,6 +108,12 @@ declare global {
     new (): HTMLViewDashboardElement;
   };
 
+  interface HTMLViewEditElement extends Components.ViewEdit, HTMLStencilElement {}
+  var HTMLViewEditElement: {
+    prototype: HTMLViewEditElement;
+    new (): HTMLViewEditElement;
+  };
+
   interface HTMLViewListElement extends Components.ViewList, HTMLStencilElement {}
   var HTMLViewListElement: {
     prototype: HTMLViewListElement;
@@ -116,6 +127,7 @@ declare global {
     'graphene-ui': HTMLGrapheneUiElement;
     'util-route-listener': HTMLUtilRouteListenerElement;
     'view-dashboard': HTMLViewDashboardElement;
+    'view-edit': HTMLViewEditElement;
     'view-list': HTMLViewListElement;
   }
 }
@@ -138,6 +150,8 @@ declare namespace LocalJSX {
   }
   interface GelTable {
     'columns'?: string[];
+    'history'?: RouterHistory;
+    'linkTo'?: (row: any, idx: number) => any;
     'rows'?: any[];
   }
   interface GrapheneNav {}
@@ -155,10 +169,15 @@ declare namespace LocalJSX {
   interface ViewDashboard {
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
+  interface ViewEdit {
+    'match'?: MatchResults;
+    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
+  }
   interface ViewList {
     'columnCount'?: number;
     'match'?: MatchResults;
-    'onPopBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
 
@@ -170,6 +189,7 @@ declare namespace LocalJSX {
     'graphene-ui': GrapheneUi;
     'util-route-listener': UtilRouteListener;
     'view-dashboard': ViewDashboard;
+    'view-edit': ViewEdit;
     'view-list': ViewList;
   }
 }
@@ -187,6 +207,7 @@ declare module "@stencil/core" {
       'graphene-ui': LocalJSX.GrapheneUi & JSXBase.HTMLAttributes<HTMLGrapheneUiElement>;
       'util-route-listener': LocalJSX.UtilRouteListener & JSXBase.HTMLAttributes<HTMLUtilRouteListenerElement>;
       'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
+      'view-edit': LocalJSX.ViewEdit & JSXBase.HTMLAttributes<HTMLViewEditElement>;
       'view-list': LocalJSX.ViewList & JSXBase.HTMLAttributes<HTMLViewListElement>;
     }
   }

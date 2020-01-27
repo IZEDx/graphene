@@ -36,7 +36,7 @@ export class GrapheneNav
                 items: Object.entries(this.objects)
                     .filter(([_, field]) => field.type instanceof GraphQLList)
                     .map(([name, _field]) => ({
-                        name: pascalCase(name), url: "/list/"+name, children: []
+                        name: pascalCase(name), url: `/${name}`, children: []
                     }))
             }
         ]

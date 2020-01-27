@@ -15,7 +15,7 @@ const preferredEndCols = ["created_at", "updated_at"];
 export class ListView 
 {
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
-    @Event() popBreadcrumb: EventEmitter<void>;
+    @Event() clearBreadcrumb: EventEmitter<void>;
 
     @Prop() match: MatchResults;
     @Prop() columnCount = 8;
@@ -23,18 +23,19 @@ export class ListView
     @State() object: GraphQLField<any, any>;
     @State() fields: GraphQLObjects;
     @State() columns: string[];
-    @State() rows: any[];
+    @State() rows: any[] = [];
+    @State() values: any[] = [];
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("schema") schema: GraphQLSchema;
     @graphene.Context("objects") objects: GraphQLObjects;
 
     @Watch("match")
-    async componentWillLoad(newMatch?: MatchResults, oldMatch?: MatchResults)
+    async componentWillLoad()
     {
-        if (newMatch && oldMatch && newMatch.url !== oldMatch.url) this.popBreadcrumb.emit();
+        this.clearBreadcrumb.emit();
         const name = this.match.params["name"];
-        this.object = this.objects?.[name];
+        this.object = this.objects?.[name]; 
         this.pushBreadcrumb.emit([name, this.match.url]);
 
         const type = this.object.type as GraphQLList<any>;
@@ -56,15 +57,17 @@ export class ListView
                 ${this.columns.join(" ")}
             }
         }`;
-        this.rows = (await this.api.client.request(request))[name];
+        this.values = (await this.api.client.request(request))[name];
 
-        for (const row of this.rows)
+        this.rows = [];
+        for (const idx in this.values)
         {
-            for (const [col, val] of Object.entries(row))
+            for (const [col, val] of Object.entries(this.values[idx]))
             {
                 const type = this.fields[col].type?.["ofType"] ?? this.fields[col].type;
 
-                row[col] = () => this.renderCell(val, type);
+                this.rows[idx] = this.rows[idx] ?? {};
+                this.rows[idx][col] = () => this.renderCell(val, type);
             }
         }
     }
@@ -78,11 +81,18 @@ export class ListView
                     <h1>{pascalCase(this.object.name)}</h1>
                     <p>{ this.object.description }</p>
                     <br />
-                    <gel-table columns={this.columns} rows={this.rows}></gel-table>
+                    <gel-table columns={this.columns} rows={this.rows} linkTo={(_, idx) => this.linkTo(idx)}></gel-table>
                 </div>
             </div>
         </segment>;
     }
+
+    linkTo(idx: number)
+    {
+        const id = this.values[idx]?.["id"];
+        return id && `/${this.object.name}/${id}`;
+    }
+
 
     renderCell(val: any, type: GraphQLScalarType)
     {

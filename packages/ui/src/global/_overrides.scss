@@ -45,8 +45,13 @@ body {
 
 .dashboard-panel
 {
-    backdrop-filter: blur(15px);
+  //backdrop-filter: blur(15px);
+  background-color: $background;
+  min-width: 300px;
 
+  @media screen and (max-width: 1024px) {
+    min-width: 220px;
+  }
 }
 
 .no-padding {
@@ -76,5 +81,9 @@ body {
 
 .box {
   border-radius: 0;
+}
+
+.has-blur-background
+{
   backdrop-filter: blur(15px);
 }
