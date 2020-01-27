@@ -52,6 +52,7 @@ export class ListView
         ].filter(col => this.fields?.[col].type instanceof GraphQLScalarType || this.fields?.[col].type?.["ofType"] instanceof GraphQLScalarType)
 
 
+        this.rows = [];
         const request = `{
             ${name} {
                 ${this.columns.join(" ")}
@@ -59,7 +60,6 @@ export class ListView
         }`;
         this.values = (await this.api.client.request(request))[name];
 
-        this.rows = [];
         for (const idx in this.values)
         {
             for (const [col, val] of Object.entries(this.values[idx]))
