@@ -41,7 +41,7 @@ export class GELMenu
         return <li>
             <stencil-route-link 
                 anchorClass={mergeClass("flex-grow", this.anchorClass, {
-                    "is-active": item.url === this.location.pathname
+                    "is-active": item.exact ? this.location.pathname === item.url : this.location.pathname.startsWith(item.url)
                 })}
                 class="no-padding is-flex-stretch clickable" 
                 url={item.url}
