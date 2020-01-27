@@ -4,6 +4,7 @@ import nodePolyfills from "rollup-plugin-node-polyfills";
 
 export const config: Config = {
   namespace: 'graphene-ui',
+  globalStyle: 'src/global/graphene-ui.scss',
   outputTargets: [
     {
       type: 'dist',
@@ -19,4 +20,4 @@ export const config: Config = {
     nodePolyfills()
   ]
 };
- 
+  

@@ -1,6 +1,19 @@
 
 graphene-ui
 {
-    display: grid;
-    background-color: red;
+    display: block;
+
+    .dashboard-main
+    {
+        height: 100vh;
+        overflow: hidden;
+        display: grid;
+        grid-template-columns: auto;
+        grid-template-rows: 3.25rem auto;
+
+        .body
+        {
+            overflow: auto;
+        }
+    }
 }

@@ -7,34 +7,170 @@
 
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
-
+import {
+  Breadcrumbs,
+} from './components/elements/gel-breadcrumbs/model';
+import {
+  ClassList,
+} from './libs/utils';
+import {
+  LocationSegments,
+  MatchResults,
+  RouteRenderProps,
+  RouterHistory,
+} from '@stencil/router';
+import {
+  Category,
+  MenuItem,
+} from './components/elements/gel-menu/model';
 
 export namespace Components {
+  interface GelBreadcrumbs {
+    'anchorClass': ClassList;
+    'breadcrumbClass': ClassList;
+    'breadcrumbs': Breadcrumbs;
+  }
+  interface GelMenu {
+    'anchorClass': ClassList;
+    'categories': Category[];
+    'categoryClass': ClassList;
+    'history': RouterHistory;
+    'listClass': ClassList;
+    'location': LocationSegments;
+    'menuClass': ClassList;
+  }
+  interface GelTable {
+    'columns': string[];
+    'rows': any[];
+  }
+  interface GrapheneNav {}
   interface GrapheneUi {
     'endPoint': string;
+    'token': string;
+  }
+  interface UtilRouteListener {
+    'props': RouteRenderProps | undefined;
+  }
+  interface ViewDashboard {}
+  interface ViewList {
+    'columnCount': number;
+    'match': MatchResults;
   }
 }
 
 declare global {
 
 
+  interface HTMLGelBreadcrumbsElement extends Components.GelBreadcrumbs, HTMLStencilElement {}
+  var HTMLGelBreadcrumbsElement: {
+    prototype: HTMLGelBreadcrumbsElement;
+    new (): HTMLGelBreadcrumbsElement;
+  };
+
+  interface HTMLGelMenuElement extends Components.GelMenu, HTMLStencilElement {}
+  var HTMLGelMenuElement: {
+    prototype: HTMLGelMenuElement;
+    new (): HTMLGelMenuElement;
+  };
+
+  interface HTMLGelTableElement extends Components.GelTable, HTMLStencilElement {}
+  var HTMLGelTableElement: {
+    prototype: HTMLGelTableElement;
+    new (): HTMLGelTableElement;
+  };
+
+  interface HTMLGrapheneNavElement extends Components.GrapheneNav, HTMLStencilElement {}
+  var HTMLGrapheneNavElement: {
+    prototype: HTMLGrapheneNavElement;
+    new (): HTMLGrapheneNavElement;
+  };
+
   interface HTMLGrapheneUiElement extends Components.GrapheneUi, HTMLStencilElement {}
   var HTMLGrapheneUiElement: {
     prototype: HTMLGrapheneUiElement;
     new (): HTMLGrapheneUiElement;
   };
+
+  interface HTMLUtilRouteListenerElement extends Components.UtilRouteListener, HTMLStencilElement {}
+  var HTMLUtilRouteListenerElement: {
+    prototype: HTMLUtilRouteListenerElement;
+    new (): HTMLUtilRouteListenerElement;
+  };
+
+  interface HTMLViewDashboardElement extends Components.ViewDashboard, HTMLStencilElement {}
+  var HTMLViewDashboardElement: {
+    prototype: HTMLViewDashboardElement;
+    new (): HTMLViewDashboardElement;
+  };
+
+  interface HTMLViewListElement extends Components.ViewList, HTMLStencilElement {}
+  var HTMLViewListElement: {
+    prototype: HTMLViewListElement;
+    new (): HTMLViewListElement;
+  };
   interface HTMLElementTagNameMap {
+    'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
+    'gel-menu': HTMLGelMenuElement;
+    'gel-table': HTMLGelTableElement;
+    'graphene-nav': HTMLGrapheneNavElement;
     'graphene-ui': HTMLGrapheneUiElement;
+    'util-route-listener': HTMLUtilRouteListenerElement;
+    'view-dashboard': HTMLViewDashboardElement;
+    'view-list': HTMLViewListElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface GelBreadcrumbs {
+    'anchorClass'?: ClassList;
+    'breadcrumbClass'?: ClassList;
+    'breadcrumbs'?: Breadcrumbs;
+  }
+  interface GelMenu {
+    'anchorClass'?: ClassList;
+    'categories'?: Category[];
+    'categoryClass'?: ClassList;
+    'history'?: RouterHistory;
+    'listClass'?: ClassList;
+    'location'?: LocationSegments;
+    'menuClass'?: ClassList;
+    'onNavigate'?: (event: CustomEvent<MenuItem>) => void;
+  }
+  interface GelTable {
+    'columns'?: string[];
+    'rows'?: any[];
+  }
+  interface GrapheneNav {}
   interface GrapheneUi {
     'endPoint'?: string;
+    'token'?: string;
+  }
+  interface UtilRouteListener {
+    'onPageDidUpdate'?: (event: CustomEvent<LocationSegments>) => void;
+    'onPageEnter'?: (event: CustomEvent<LocationSegments>) => void;
+    'onPageLeave'?: (event: CustomEvent<LocationSegments>) => void;
+    'onPageWillUpdate'?: (event: CustomEvent<LocationSegments>) => void;
+    'props'?: RouteRenderProps | undefined;
+  }
+  interface ViewDashboard {
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
+  }
+  interface ViewList {
+    'columnCount'?: number;
+    'match'?: MatchResults;
+    'onPopBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
 
   interface IntrinsicElements {
+    'gel-breadcrumbs': GelBreadcrumbs;
+    'gel-menu': GelMenu;
+    'gel-table': GelTable;
+    'graphene-nav': GrapheneNav;
     'graphene-ui': GrapheneUi;
+    'util-route-listener': UtilRouteListener;
+    'view-dashboard': ViewDashboard;
+    'view-list': ViewList;
   }
 }
 
@@ -44,7 +180,14 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;
+      'gel-menu': LocalJSX.GelMenu & JSXBase.HTMLAttributes<HTMLGelMenuElement>;
+      'gel-table': LocalJSX.GelTable & JSXBase.HTMLAttributes<HTMLGelTableElement>;
+      'graphene-nav': LocalJSX.GrapheneNav & JSXBase.HTMLAttributes<HTMLGrapheneNavElement>;
       'graphene-ui': LocalJSX.GrapheneUi & JSXBase.HTMLAttributes<HTMLGrapheneUiElement>;
+      'util-route-listener': LocalJSX.UtilRouteListener & JSXBase.HTMLAttributes<HTMLUtilRouteListenerElement>;
+      'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
+      'view-list': LocalJSX.ViewList & JSXBase.HTMLAttributes<HTMLViewListElement>;
     }
   }
 }

@@ -13,12 +13,17 @@
     "typesync": "npx typesync"
   },
   "devDependencies": {
+    "@nestjs/cli": "^6.14.1",
     "@stencil/core": "latest",
     "@stencil/router": "latest",
     "@stencil/sass": "latest",
     "bulma": "latest",
+    "bulma-dashboard": "^0.3.1",
     "chalk": "latest",
+    "change-case": "^4.1.1",
     "cross-env": "latest",
+    "graphql": "^14.5.8",
+    "graphql-request": "^1.8.2",
     "lerna": "latest",
     "parcel": "latest",
     "rollup-plugin-node-polyfills": "^0.2.1",
