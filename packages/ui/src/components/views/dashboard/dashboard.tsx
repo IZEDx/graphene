@@ -1,6 +1,5 @@
 import { Component, h, Event, EventEmitter } from "@stencil/core";
 import { graphene } from "../../../global/context";
-import { GraphQLSchema } from "graphql";
 import { GrapheneAPI } from "../../../global/api";
 
 
@@ -12,7 +11,6 @@ export class DashboardView
 {
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
 
-    @graphene.Context("schema") schema: GraphQLSchema;
     @graphene.Context("api") api: GrapheneAPI;
 
     componentWillLoad()

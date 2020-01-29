@@ -1,9 +1,8 @@
 import { Component, h, Prop, Event, EventEmitter, Watch, State } from "@stencil/core";
 import { MatchResults } from "@stencil/router";
-import { graphene, GraphQLObjects } from "../../../global/context";
-import { GraphQLSchema, GraphQLObjectType, GraphQLScalarType, GraphQLField, GraphQLUnionType, GraphQLList, GraphQLOutputType, GraphQLNonNull } from "graphql";
-import { pascalCase } from "change-case";
+import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
+import { Graphene, GrapheneObjectType, GrapheneQueryField } from "../../../libs/graphene";
 
 @Component({
     tag: 'view-edit',
@@ -17,10 +16,9 @@ export class EditView
     @Prop() match: MatchResults;
 
     @graphene.Context("api") api: GrapheneAPI;
-    @graphene.Context("schema") schema: GraphQLSchema;
-    @graphene.Context("objects") objects: GraphQLObjects;
+    @graphene.Context("graphene") graphene: Graphene;
 
-    @State() type: GraphQLObjectType;
+    @State() definition: GrapheneQueryField<GrapheneObjectType>;
     @State() object: Record<string, any>;
 
     get name()
@@ -40,50 +38,44 @@ export class EditView
         this.pushBreadcrumb.emit([this.name, this.match.url]);
         this.pushBreadcrumb.emit([this.id, this.match.url]);
 
-        const name = Object.keys(this.objects).find(k => this.name.toLowerCase().startsWith(k.toLowerCase()));
-        const object = this.objects[name];
-        this.type = object.type as GraphQLObjectType;
+        this.definition = this.graphene.getQuery(this.name).asObject();
+        this.object = (await this.definition.request({id: this.id}))[this.definition.name];
 
-        const request = `{
-            ${name}(id: ${this.id}) {
-                ${this.queryFields(this.type)}
-            }
-        }`;
-
-        this.object = (await this.api.client.request(request)).page;
         console.log(this.object);
-
     }
 
     render()
     {
         return <segment class="segment">
             <div class="container">
-                <div class="level">
-                    <div class="level-left">
-                        <div class="level-item content">
-                            <h1>
-                                <stencil-route-link url={"/"+this.name}>
-                                    &lt; Back
-                                </stencil-route-link>
-                            </h1>
+                <div class="box has-blur-background">
+                    <div class="level">
+                        <div class="level-left">
+                            <div class="level-item content">
+                                <h1>
+                                    <stencil-route-link url={"/"+this.name}>
+                                        &lt; Back
+                                    </stencil-route-link>
+                                </h1>
+                            </div>
+                        </div>
+                        <div class="level-right">
+                            <div class="level-item">
+                                <button class="button is-primary">Save</button>
+                            </div>
                         </div>
                     </div>
-                    <div class="level-right">
-                        <div class="level-item">
-                            <button class="button is-primary">Save</button>
-                        </div>
-                    </div>
+                    { Object.entries(this.object ?? {})
+                        .map(([key, val]) => this.renderField(key, val))
+                    }
                 </div>
-                { Object.entries(this.object)
-                    .map(([key, val]) => this.renderField(key, val))
-                }
             </div>
         </segment>;
     }
 
     renderField(key: string, val: any)
     {
+        const field = this.definition.type.fieldMap[key];
         return (
             <div class="field is-horizontal">
                 <div class="field-label is-normal">
@@ -92,7 +84,7 @@ export class EditView
                 <div class="field-body">
                     <div class="field">
                         <p class="control is-expanded">
-                            { this.renderValue(key, val) }
+                            { field.type.renderEdit(val) }
                         </p>
                     </div>
                 </div>
@@ -100,9 +92,10 @@ export class EditView
         );
     }
 
+    /*
     renderValue(key: string, val: any)
     {
-        const field = this.type.getFields()[key];
+        const field = this.definition.type.fieldMap[key];
         const type = field.type?.["ofType"] ?? field.type;
 
         switch (type.name)
@@ -176,4 +169,5 @@ export class EditView
     {
         return t instanceof c || t?.["ofType"] instanceof c;
     }
+    */
 }

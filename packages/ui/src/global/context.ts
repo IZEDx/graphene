@@ -1,13 +1,10 @@
 import { Entanglement, qt } from "stencil-quantum";
 import { GrapheneAPI } from "./api";
-import { GraphQLSchema, GraphQLFieldMap, GraphQLObjectType } from "graphql";
-
-export type GraphQLObjects = GraphQLFieldMap<any, any, Record<string, GraphQLObjectType>>;
+import { Graphene } from "../libs/graphene";
 
 export const graphene = new Entanglement({
     api: qt<GrapheneAPI>(),
-    schema: qt<GraphQLSchema>(),
-    objects: qt<GraphQLObjects>(),
+    graphene: qt<Graphene>(),
     connected: qt<boolean>({default: false})
 });
 

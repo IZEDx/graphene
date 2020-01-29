@@ -1,0 +1,169 @@
+[
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "createDocInput",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "data",
+                "type": {
+                    "name": "DocInput",
+                    "kind": "INPUT_OBJECT"
+                }
+            }
+        ],
+        "fields": null
+    },
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "DocInput",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "title",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            },
+            {
+                "name": "path",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            },
+            {
+                "name": "hidden",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            },
+            {
+                "name": "content",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            },
+            {
+                "name": "category",
+                "type": {
+                    "name": "String",
+                    "kind": "SCALAR"
+                }
+            },
+            {
+                "name": "parent",
+                "type": {
+                    "name": "ID",
+                    "kind": "SCALAR"
+                }
+            }
+        ],
+        "fields": null
+    },
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "updateDocInput",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "where",
+                "type": {
+                    "name": "InputID",
+                    "kind": "INPUT_OBJECT"
+                }
+            },
+            {
+                "name": "data",
+                "type": {
+                    "name": "editDocInput",
+                    "kind": "INPUT_OBJECT"
+                }
+            }
+        ],
+        "fields": null
+    },
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "InputID",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "id",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            }
+        ],
+        "fields": null
+    },
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "editDocInput",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "title",
+                "type": {
+                    "name": "String",
+                    "kind": "SCALAR"
+                }
+            },
+            {
+                "name": "path",
+                "type": {
+                    "name": "String",
+                    "kind": "SCALAR"
+                }
+            },
+            {
+                "name": "hidden",
+                "type": {
+                    "name": "Boolean",
+                    "kind": "SCALAR"
+                }
+            },
+            {
+                "name": "content",
+                "type": {
+                    "name": null,
+                    "kind": "NON_NULL"
+                }
+            },
+            {
+                "name": "category",
+                "type": {
+                    "name": "String",
+                    "kind": "SCALAR"
+                }
+            },
+            {
+                "name": "parent",
+                "type": {
+                    "name": "ID",
+                    "kind": "SCALAR"
+                }
+            }
+        ],
+        "fields": null
+    },
+    {
+        "kind": "INPUT_OBJECT",
+        "name": "deleteDocInput",
+        "ofType": null,
+        "inputFields": [
+            {
+                "name": "where",
+                "type": {
+                    "name": "InputID",
+                    "kind": "INPUT_OBJECT"
+                }
+            }
+        ],
+        "fields": null
+    }
+]

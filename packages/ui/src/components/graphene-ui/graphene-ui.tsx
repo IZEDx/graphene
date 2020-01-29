@@ -1,12 +1,12 @@
 import { Component, Prop, h, Host, Listen, State } from '@stencil/core';
-import { graphene, GraphQLObjects, nav } from '../../global/context';
+import { graphene, nav } from '../../global/context';
 import { GrapheneAPI, APIQueries } from '../../global/api';
 import { API } from '../../libs/api';
-import { buildClientSchema, GraphQLSchema } from 'graphql';
 import "@stencil/router";
 import { Breadcrumbs } from '../elements/gel-breadcrumbs/model';
 import { pascalCase } from "change-case";
 import { MenuItem } from '../elements/gel-menu/model';
+import { Graphene } from '../../libs/graphene';
 
 @Component({
     tag: 'graphene-ui',
@@ -20,19 +20,20 @@ export class GrapheneUI
     @State() breadcrumb: Breadcrumbs = [["Dashboard", "/"]];
 
     @graphene.Provide("api") api: GrapheneAPI;
-    @graphene.Provide("schema") schema: GraphQLSchema;
-    @graphene.Provide("objects") objects: GraphQLObjects;
-    @graphene.Provide("connected") isConnected: boolean;
+    @graphene.Provide("graphene") graphene: Graphene;
+    @graphene.Provide("connected") isConnected = false;
 
     @nav.Provide("isExpanded") isExpanded = false;
 
     async componentWillLoad()
     {
         this.api = new API(this.endPoint, this.token, APIQueries);
-        this.schema = buildClientSchema(await this.api.query("introspect"));
-        this.objects = this.schema.getQueryType().getFields() as any;
-        this.isConnected = true;
+        this.graphene = new Graphene(this.api);
         this.breadcrumb = [[this.endPoint, "/"]];
+
+        await this.graphene.load();
+        this.isConnected = true;
+        console.log(this.graphene);
     }
 
     @Listen("pushBreadcrumb")
@@ -77,8 +78,8 @@ export class GrapheneUI
                 <div class="dashboard is-full-height">
                     <graphene-nav></graphene-nav>
 
-                    <div class="dashboard-main is-scrollable">
-                        <nav class="navbar is-fixed-top">
+                    <div class="dashboard-main">
+                        <nav class="navbar has-blur-background">
                             <div class="navbar-brand">
                                 <span class="navbar-item is-hidden-mobile">
                                     <gel-breadcrumbs breadcrumbs={this.breadcrumb}></gel-breadcrumbs>
@@ -91,7 +92,7 @@ export class GrapheneUI
                             </div>
                         </nav>
 
-                        <div class="body box is-fullheight has-blur-background">
+                        <div class="body is-fullheight">
                             <stencil-router onClick={() => {
                                 this.isExpanded = false;
                             }}>

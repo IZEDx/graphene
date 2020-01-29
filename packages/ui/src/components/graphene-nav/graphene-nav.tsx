@@ -1,9 +1,9 @@
 import { Component, h, State } from '@stencil/core';
-import { graphene, GraphQLObjects, nav } from '../../global/context';
-import {  GraphQLSchema, GraphQLList } from 'graphql';
+import { graphene, nav } from '../../global/context';
 import { Category } from '../elements/gel-menu/model';
 import { pascalCase } from "change-case";
 import { mergeClass } from '../../libs/utils';
+import { Graphene } from '../../libs/graphene';
 
 @Component({
     tag: 'graphene-nav',
@@ -11,8 +11,7 @@ import { mergeClass } from '../../libs/utils';
 })
 export class GrapheneNav 
 {
-    @graphene.Context("schema") schema: GraphQLSchema;
-    @graphene.Context("objects") objects: GraphQLObjects;
+    @graphene.Context("graphene") graphene: Graphene;
     @graphene.Context("connected") isConnected: boolean;
     @nav.Context("isExpanded") isExpanded: boolean;
 
@@ -34,11 +33,12 @@ export class GrapheneNav
             },
             {
                 name: "Content",
-                items: Object.entries(this.objects)
-                    .filter(([_, field]) => field.type instanceof GraphQLList)
-                    .map(([name, _field]) => ({
-                        name: pascalCase(name), url: `/${name}`, children: [], exact: false
-                    }))
+                items: this.graphene.queryLists.map(({name}) => ({
+                    name: pascalCase(name), 
+                    url: `/${name}`, 
+                    children: [], 
+                    exact: false
+                }))
             }
         ]
     }

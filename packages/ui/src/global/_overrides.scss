@@ -8,35 +8,42 @@ body {
   margin: 0px;
   padding: 0px;
   font-family: -apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif,"Apple Color Emoji","Segoe UI Emoji","Segoe UI Symbol";
-  background-image: url(https://source.unsplash.com/daily?night);
+  background-image: url(https://images.wallpaperscraft.com/image/sand_desert_dunes_137817_1920x1080.jpg);
   background-size: cover;
   background-position: center center;
 }
 
-::-webkit-scrollbar              { 
+::-webkit-scrollbar { 
   background: none; 
   width: 10px;
   height: 10px;
 }
-::-webkit-scrollbar-button       {
+
+::-webkit-scrollbar-track {
   background: none;
 }
-::-webkit-scrollbar-track        {
+
+::-webkit-scrollbar-track-piece {
   background: none;
 }
-::-webkit-scrollbar-track-piece  {
-  background: none;
-}
-::-webkit-scrollbar-thumb        {
+
+::-webkit-scrollbar-thumb {
   background: rgba(200,200,200,0.1);
   //border: solid 1px rgba(200,200,200,0.2);
   border-radius: 15px;
 }
-::-webkit-scrollbar-corner       {
+
+::-webkit-scrollbar-corner {
   background: none;
 }
-::-webkit-resizer                {
+
+::-webkit-resizer {
   background: none;
+}
+
+::-webkit-scrollbar-button {
+  width: 5px;
+  height: 5px;
 }
 
 .modal-background {
@@ -51,6 +58,20 @@ body {
 
   @media screen and (max-width: 1024px) {
     min-width: 220px;
+  }
+}
+
+.dashboard-main > .body
+{
+  background-color: rgba(0,0,0, 0.6);
+
+  segment.segment
+  {
+    width: 100%;
+    display: block;
+    @media screen and (min-width: 1024px) {
+      padding-top: 40px;
+    }
   }
 }
 
