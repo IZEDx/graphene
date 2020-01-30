@@ -1,5 +1,5 @@
 import { GrapheneAPI } from "../global/api";
-import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType } from "graphql";
+import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType } from "graphql";
 import hash from "object-hash";
 
 const log = (..._args: any[]) =>  console.log("[Graphene]", ..._args);
@@ -7,7 +7,7 @@ const log = (..._args: any[]) =>  console.log("[Graphene]", ..._args);
 const maxScopes = 5;
 const caching = false;
 
-export type Kind = "LIST"|"OBJECT"|"SCALAR"|"NONNULL"|"UNION"|"UNKNOWN"; 
+export type Kind = "LIST"|"OBJECT"|"INPUT_OBJECT"|"SCALAR"|"NONNULL"|"UNION"|"UNKNOWN"; 
 
 export class Graphene
 {
@@ -16,6 +16,9 @@ export class Graphene
 
     queryFields: GrapheneQueryField<GrapheneType<any>>[] = [];
     queryFieldMap: Record<string, GrapheneQueryField<GrapheneType<any>>> = {};
+
+    mutationFields: GrapheneQueryField<GrapheneInputObjectType>[] = [];
+    mutationFieldMap: Record<string, GrapheneQueryField<GrapheneInputObjectType>> = {};
 
     constructor(public api: GrapheneAPI)
     {}
@@ -43,6 +46,11 @@ export class Graphene
         return this.queryFieldMap[name] as any;
     }
 
+    getMutation<T extends GrapheneInputObjectType>(name: string): GrapheneQueryField<T>|undefined
+    {
+        return this.mutationFieldMap[name] as any;
+    }
+
     get queryLists(): GrapheneQueryField<GrapheneListType>[]
     {
         return this.queryFields.filter(f => f.isList()) as any; 
@@ -54,6 +62,8 @@ export class Graphene
     }
 
 }
+
+// #region GrapheneField
 
 export class GrapheneField<T extends GrapheneType<GraphQLOutputType> = GrapheneType<GraphQLOutputType>>
 {
@@ -129,7 +139,9 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
     {
         const result = await super.create<GrapheneQueryField>(name, _field, new GrapheneQueryField(name, _field) as any);
         result.graphene = graphene;
-        console.log("GRAPHENE", name, result.graphene);
+
+        log("Analyzing mutations of QueryField")
+
         return result as any;
     }
 
@@ -159,6 +171,10 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         return this as any;
     }
 }
+
+// #endregion
+
+// #region GrapheneType
 
 export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputType>
 {
@@ -372,6 +388,38 @@ export class GrapheneUnionType extends GrapheneType<GraphQLUnionType>
     }
 }
 
+export class GrapheneInputObjectType extends GrapheneType
+{
+    fields: GrapheneField<GrapheneInputObjectType>[] = [];
+    fieldMap: Record<string, GrapheneField<GrapheneInputObjectType>>;
+    
+    static async create(type: GraphQLOutputType)
+    {
+        const o = new GrapheneInputObjectType(type as any);
+        o.fields = await GrapheneField.fromFieldMap(type["getFields"]() as any);
+        o.fieldMap = o.fields.reduce((a, b) => ({...a, [b.name]: b}), {});
+        return o;
+    } 
+
+    toQuery(c = maxScopes)
+    {
+        return "";
+    }
+
+    renderCell(val: any)
+    {
+        return "";
+    }
+
+    renderEdit(val: any)
+    {
+        return "";
+    }
+}
+
+// #endregion
+
+
 export type GrapheneArgument<
     T extends GrapheneType<GraphQLOutputType> = GrapheneType<GraphQLOutputType>
 > = GraphQLArgument & { type:  T };
@@ -382,6 +430,7 @@ export const kindMap = {
     SCALAR: GrapheneScalarType,
     NONNULL: GrapheneNonNullType,
     UNION: GrapheneUnionType,
+    INPUT_OBJECT: GrapheneInputObjectType,
     UNKNOWN: GrapheneType
 }
 
@@ -392,6 +441,7 @@ function getKind(type: GraphQLOutputType): Kind
     if (type instanceof GraphQLScalarType) return "SCALAR";
     if (type instanceof GraphQLNonNull) return "NONNULL";
     if (type instanceof GraphQLUnionType) return "UNION";
+    if (type instanceof GraphQLInputObjectType) return "INPUT_OBJECT";
 
     return "UNKNOWN";
 }
