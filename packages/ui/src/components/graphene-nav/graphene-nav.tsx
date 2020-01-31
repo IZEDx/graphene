@@ -1,6 +1,6 @@
 import { Component, h, State } from '@stencil/core';
 import { graphene, nav } from '../../global/context';
-import { Category } from '../elements/gel-menu/model';
+import { Category } from '../elements/menu/model';
 import { pascalCase } from "change-case";
 import { mergeClass } from '../../libs/utils';
 import { Graphene } from '../../libs/graphene';

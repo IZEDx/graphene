@@ -3,6 +3,10 @@ import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField } from "../../../libs/graphene";
+import { pascalCase } from "change-case";
+
+const preferredColumns = ["id", "name", "title", "url", "description"];
+const readOnlyColumns = ["id", "created_at", "updated_at"];
 
 @Component({
     tag: 'view-edit',
@@ -19,7 +23,7 @@ export class EditView
     @graphene.Context("graphene") graphene: Graphene;
 
     @State() definition: GrapheneQueryField<GrapheneObjectType>;
-    @State() object: Record<string, any>;
+    @State() entries: [string, any][];
 
     get name()
     {
@@ -32,31 +36,59 @@ export class EditView
     }
 
     @Watch("match")
-    async componentWillLoad(newMatch?: MatchResults, oldMatch?: MatchResults)
+    async refresh(newMatch?: MatchResults, oldMatch?: MatchResults)
     {
         if (newMatch && oldMatch && newMatch.url !== oldMatch.url) this.clearBreadcrumb.emit();
+        await this.componentWillLoad();
+        await this.componentDidLoad();
+    }
+
+    async componentWillLoad()
+    {
         this.pushBreadcrumb.emit([this.name, this.match.url]);
         this.pushBreadcrumb.emit([this.id, this.match.url]);
 
         this.definition = this.graphene.getQuery(this.name).asObject();
-        this.object = (await this.definition.request({id: this.id}))[this.definition.name];
+    }
 
-        console.log(this.object);
+    async componentDidLoad()
+    {
+        const object = (await this.definition.request({id: this.id}))[this.definition.name];
+
+        this.entries = Object.entries(object ?? {})
+            .sort((a, b) => {
+                const aIdx = preferredColumns.findIndex((k) => k === a[0]);
+                const bIdx = preferredColumns.findIndex((k) => k === b[0]);
+
+                if (aIdx === -1 && bIdx !== -1)
+                    return 1;
+                if (aIdx !== -1 && bIdx === -1)
+                    return -1;
+                if (aIdx === -1 && bIdx === -1)
+                    return 0;
+
+                return aIdx > bIdx ? 1 : -1;
+            });
+
+        console.log(this.entries);
     }
 
     render()
     {
+
         return <segment class="segment">
             <div class="container">
                 <div class="box has-blur-background">
                     <div class="level">
                         <div class="level-left">
                             <div class="level-item content">
-                                <h1>
+                                <h2>
                                     <stencil-route-link url={"/"+this.name}>
                                         &lt; Back
                                     </stencil-route-link>
-                                </h1>
+                                    &nbsp;&nbsp;&nbsp;
+                                    {pascalCase(this.definition.name)}
+                                </h2>
                             </div>
                         </div>
                         <div class="level-right">
@@ -65,13 +97,23 @@ export class EditView
                             </div>
                         </div>
                     </div>
-                    { Object.entries(this.object ?? {})
-                        .map(([key, val]) => this.renderField(key, val))
-                    }
+                    <gel-form>
+                        { this.entries?.map(([key, value]) => {
+                            const field = this.definition.type.fieldMap[key];
+                            return field.type.renderEdit({ 
+                                formKey: key, 
+                                value, 
+                                label: field.name, 
+                                disabled: readOnlyColumns.findIndex(v => v === key) > -1
+                            })
+                        }) }
+                    </gel-form>
                 </div>
             </div>
         </segment>;
     }
+
+    /*
 
     renderField(key: string, val: any)
     {
@@ -91,8 +133,6 @@ export class EditView
             </div>
         );
     }
-
-    /*
     renderValue(key: string, val: any)
     {
         const field = this.definition.type.fieldMap[key];

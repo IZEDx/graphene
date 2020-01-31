@@ -3,9 +3,9 @@ import { graphene, nav } from '../../global/context';
 import { GrapheneAPI, APIQueries } from '../../global/api';
 import { API } from '../../libs/api';
 import "@stencil/router";
-import { Breadcrumbs } from '../elements/gel-breadcrumbs/model';
+import { Breadcrumbs } from '../elements/breadcrumbs/model';
 import { pascalCase } from "change-case";
-import { MenuItem } from '../elements/gel-menu/model';
+import { MenuItem } from '../elements/menu/model';
 import { Graphene } from '../../libs/graphene';
 
 @Component({

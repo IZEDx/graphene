@@ -9,7 +9,7 @@
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
   Breadcrumbs,
-} from './components/elements/gel-breadcrumbs/model';
+} from './components/elements/breadcrumbs/model';
 import {
   ClassList,
 } from './libs/utils';
@@ -22,13 +22,30 @@ import {
 import {
   Category,
   MenuItem,
-} from './components/elements/gel-menu/model';
+} from './components/elements/menu/model';
 
 export namespace Components {
   interface GelBreadcrumbs {
     'anchorClass': ClassList;
     'breadcrumbClass': ClassList;
     'breadcrumbs': Breadcrumbs;
+  }
+  interface GelForm {}
+  interface GelInputSwitch {
+    'disabled'?: boolean;
+    'formKey': string;
+    'inputClass': string|Record<string, boolean>;
+    'label'?: string;
+    'value'?: boolean;
+  }
+  interface GelInputText {
+    'disabled'?: boolean;
+    'formKey': string;
+    'inputClass': string|Record<string, boolean>;
+    'label'?: string;
+    'placeholder'?: string;
+    'type': string;
+    'value'?: string;
   }
   interface GelMenu {
     'anchorClass': ClassList;
@@ -70,6 +87,24 @@ declare global {
   var HTMLGelBreadcrumbsElement: {
     prototype: HTMLGelBreadcrumbsElement;
     new (): HTMLGelBreadcrumbsElement;
+  };
+
+  interface HTMLGelFormElement extends Components.GelForm, HTMLStencilElement {}
+  var HTMLGelFormElement: {
+    prototype: HTMLGelFormElement;
+    new (): HTMLGelFormElement;
+  };
+
+  interface HTMLGelInputSwitchElement extends Components.GelInputSwitch, HTMLStencilElement {}
+  var HTMLGelInputSwitchElement: {
+    prototype: HTMLGelInputSwitchElement;
+    new (): HTMLGelInputSwitchElement;
+  };
+
+  interface HTMLGelInputTextElement extends Components.GelInputText, HTMLStencilElement {}
+  var HTMLGelInputTextElement: {
+    prototype: HTMLGelInputTextElement;
+    new (): HTMLGelInputTextElement;
   };
 
   interface HTMLGelMenuElement extends Components.GelMenu, HTMLStencilElement {}
@@ -121,6 +156,9 @@ declare global {
   };
   interface HTMLElementTagNameMap {
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
+    'gel-form': HTMLGelFormElement;
+    'gel-input-switch': HTMLGelInputSwitchElement;
+    'gel-input-text': HTMLGelInputTextElement;
     'gel-menu': HTMLGelMenuElement;
     'gel-table': HTMLGelTableElement;
     'graphene-nav': HTMLGrapheneNavElement;
@@ -137,6 +175,25 @@ declare namespace LocalJSX {
     'anchorClass'?: ClassList;
     'breadcrumbClass'?: ClassList;
     'breadcrumbs'?: Breadcrumbs;
+  }
+  interface GelForm {}
+  interface GelInputSwitch {
+    'disabled'?: boolean;
+    'formKey'?: string;
+    'inputClass'?: string|Record<string, boolean>;
+    'label'?: string;
+    'onInputUpdate'?: (event: CustomEvent<{formKey: string, value: any}>) => void;
+    'value'?: boolean;
+  }
+  interface GelInputText {
+    'disabled'?: boolean;
+    'formKey'?: string;
+    'inputClass'?: string|Record<string, boolean>;
+    'label'?: string;
+    'onInputUpdate'?: (event: CustomEvent<{formKey: string, value: any}>) => void;
+    'placeholder'?: string;
+    'type'?: string;
+    'value'?: string;
   }
   interface GelMenu {
     'anchorClass'?: ClassList;
@@ -183,6 +240,9 @@ declare namespace LocalJSX {
 
   interface IntrinsicElements {
     'gel-breadcrumbs': GelBreadcrumbs;
+    'gel-form': GelForm;
+    'gel-input-switch': GelInputSwitch;
+    'gel-input-text': GelInputText;
     'gel-menu': GelMenu;
     'gel-table': GelTable;
     'graphene-nav': GrapheneNav;
@@ -201,6 +261,9 @@ declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
       'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;
+      'gel-form': LocalJSX.GelForm & JSXBase.HTMLAttributes<HTMLGelFormElement>;
+      'gel-input-switch': LocalJSX.GelInputSwitch & JSXBase.HTMLAttributes<HTMLGelInputSwitchElement>;
+      'gel-input-text': LocalJSX.GelInputText & JSXBase.HTMLAttributes<HTMLGelInputTextElement>;
       'gel-menu': LocalJSX.GelMenu & JSXBase.HTMLAttributes<HTMLGelMenuElement>;
       'gel-table': LocalJSX.GelTable & JSXBase.HTMLAttributes<HTMLGelTableElement>;
       'graphene-nav': LocalJSX.GrapheneNav & JSXBase.HTMLAttributes<HTMLGrapheneNavElement>;

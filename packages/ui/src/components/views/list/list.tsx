@@ -6,7 +6,7 @@ import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneField, GrapheneListType, GrapheneObjectType } from "../../../libs/graphene";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
-const preferredEndCols = ["created_at", "updated_at"];
+const preferredEndColumns = ["created_at", "updated_at"];
 
 @Component({
     tag: 'view-list',
@@ -40,7 +40,7 @@ export class ListView
         if (!(type instanceof GrapheneObjectType)) return;
         
         const preferred = preferredColumns.filter(s => type.fieldMap[s] !== undefined);
-        const preferredEnd = preferredEndCols.filter(s => type.fieldMap[s] !== undefined);
+        const preferredEnd = preferredEndColumns.filter(s => type.fieldMap[s] !== undefined);
         const rest = Object.keys(type.fieldMap).filter(s => !preferred.includes(s) && !preferredEnd.includes(s));
 
         this.columns = [

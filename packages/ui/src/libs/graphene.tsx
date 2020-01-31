@@ -1,8 +1,9 @@
 import { GrapheneAPI } from "../global/api";
 import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType } from "graphql";
 import hash from "object-hash";
+import { h } from "@stencil/core";
 
-const log = (..._args: any[]) =>  console.log("[Graphene]", ..._args);
+const log = (..._args: any[]) => {}// console.log("[Graphene]", ..._args);
 
 const maxScopes = 5;
 const caching = false;
@@ -317,9 +318,16 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
         }
     }
 
-    renderEdit(_val: any)
+    renderEdit(props: any)
     {
-        return `Edit Scalar(${this.name})`;
+        switch (this.type.name)
+        {
+            case "DateTime": return <gel-input-text {...props} key={props.key}></gel-input-text>;
+            case "Boolean": return <gel-input-switch {...props} key={props.key}></gel-input-switch>;
+            case "ID": return <gel-input-text {...props} key={props.key}></gel-input-text>;
+            case "String": return <gel-input-text {...props} key={props.key}></gel-input-text>;
+            default: return <gel-input-text {...props} key={props.key}></gel-input-text>;
+        }
     }
 }
 
@@ -346,7 +354,7 @@ export class GrapheneNonNullType<T extends GrapheneType = GrapheneType> extends 
 
     renderEdit(val: any)
     {
-        return `Edit NonNull(${this.ofType.renderEdit(val)})`;
+        return this.ofType.renderEdit(val);
     }
 }
 
@@ -401,17 +409,17 @@ export class GrapheneInputObjectType extends GrapheneType
         return o;
     } 
 
-    toQuery(c = maxScopes)
+    toQuery(_c = maxScopes)
     {
         return "";
     }
 
-    renderCell(val: any)
+    renderCell(_val: any)
     {
         return "";
     }
 
-    renderEdit(val: any)
+    renderEdit(_val: any)
     {
         return "";
     }
