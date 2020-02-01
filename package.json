@@ -9,7 +9,8 @@
     "dev:api": "cd ./packages/api && npm run dev",
     "dev:ui": "cd ./packages/ui && npm run dev",
     "test": "npx lerna run test",
-    "start": "npm run && node bin/server.js",
+    "start": "node bin/graphene-cms.js",
+    "start:dev": "nodemon --watch packages/api/dist npm start",
     "typesync": "npx typesync"
   },
   "devDependencies": {
@@ -27,6 +28,7 @@
     "graphql": "^14.5.8",
     "graphql-request": "^1.8.2",
     "lerna": "latest",
+    "nodemon": "^2.0.2",
     "object-hash": "^2.0.1",
     "parcel": "latest",
     "rollup-plugin-node-polyfills": "^0.2.1",
