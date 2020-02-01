@@ -54,7 +54,7 @@ export class Graphene
 
     get queryLists(): GrapheneQueryField<GrapheneListType>[]
     {
-        return this.queryFields.filter(f => f.isList()) as any; 
+        return this.queryFields.filter(({type}) => type.isList() || type.isNonNull() && type.ofType.isList()) as any; 
     }
 
     get queryObjects(): GrapheneQueryField<GrapheneObjectType>[]
@@ -146,12 +146,21 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         return result as any;
     }
 
-    async request<T = any>(args?: Record<string, string>)
+    async request<T = any>(args?: Record<string, string|number>)
     {
-        const argStr = args ? `(${Object.entries(args).map(([k, v]) => `${k}: ${v}`).join(", ")})` : "";
+        const fields = this.type.isObject() && this.type.fieldMap;
+        const argStr = args ? `(${Object.entries(args).map(([k, v]) => 
+        {
+            const field = fields[k];
+
+            const quoted = typeof v === "string" || field.name === "String"
+            return  `${k}: ` + (quoted ? `"${v}"` : v);
+        }).join(", ")})` : "";
+        
         const query = `{
             ${this.name}${argStr} ${this.type.toQuery()}
         }`;
+        
         console.log(query);
         return this.graphene.api.client.request<T>(query);
     }
@@ -166,7 +175,6 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
     asObject(): GrapheneQueryField<GrapheneObjectType>
     {
         if (!this.name.endsWith("s")) return this as any;
-        console.log("asObj ", name, this);
         const obj = this.graphene.queryFieldMap[this.name.slice(0, this.name.length - 1)];
         if (obj) return obj as any;
         return this as any;
@@ -222,10 +230,20 @@ export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputTy
 
     isList =    (): this is GrapheneListType    => this.kind === "LIST";
     isObject =  (): this is GrapheneObjectType  => this.kind === "OBJECT";
-    isScalar =  (): this is GrapheneScalarType  => this.kind === "SCALAR" || this.isNonNull() && this.ofType.isScalar();
+    isScalar =  (): this is GrapheneScalarType  => this.kind === "SCALAR";
     isNonNull = (): this is GrapheneNonNullType => this.kind === "NONNULL";
-    isUnion =   (): this is GrapheneType        => this.kind === "UNION";
+    isUnion =   (): this is GrapheneUnionType   => this.kind === "UNION";
     isUnknown = (): this is GrapheneType        => this.kind === "UNKNOWN";
+
+    getType<R extends GrapheneType>(type: Function&{create(...args: any[]): Promise<R>}, c = 5): R|undefined
+    {
+        if (c < 0) return undefined;
+        if (this instanceof type) return this as any;
+        if (this.isNonNull()) return this.ofType.getType(type, c - 1);
+        if (this.isUnion()) return this.types.map(t => t.getType(type, c - 1)).find(t => t !== undefined);
+
+        return undefined;
+    }
 }
 
 export class GrapheneListType<T extends GrapheneType = GrapheneType> extends GrapheneType<GraphQLOutputType>
@@ -291,14 +309,15 @@ export class GrapheneObjectType extends GrapheneType<GraphQLObjectType>
     }
 }
 
+export type GrapheneScalarTypeNames = "DateTime"|"Boolean"|"ID"|"String";
 export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
 {
     static async create(type: GraphQLScalarType)
     {
-        return new GrapheneScalarType(type);
+        return new GrapheneScalarType(type, type.name as any);
     }
 
-    protected constructor(private type: GraphQLScalarType)
+    protected constructor(private type: GraphQLScalarType, public name: GrapheneScalarTypeNames)
     { super(type); }
 
     toQuery()
@@ -308,7 +327,7 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
 
     renderCell(val: any)
     {
-        switch(this.type.name)
+        switch(this.name)
         {
             case "DateTime": return new Date(val).toLocaleString();
             case "Boolean": return ""+val;

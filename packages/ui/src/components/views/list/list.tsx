@@ -3,7 +3,7 @@ import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { pascalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneField, GrapheneListType, GrapheneObjectType } from "../../../libs/graphene";
+import { Graphene, GrapheneField, GrapheneListType, GrapheneObjectType, GrapheneScalarType } from "../../../libs/graphene";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const preferredEndColumns = ["created_at", "updated_at"];
@@ -36,12 +36,18 @@ export class ListView
         this.pushBreadcrumb.emit([name, this.match.url]);
 
         this.definition = this.graphene.getQuery(name); 
-        const type = this.definition.type.ofType;
+        const list = this.definition.type.ofType;
+        const nonnull = list.isList() ? list.ofType : list;
+        const type = nonnull.isNonNull() ? nonnull.ofType : nonnull;
+
+        console.log(type);
         if (!(type instanceof GrapheneObjectType)) return;
         
         const preferred = preferredColumns.filter(s => type.fieldMap[s] !== undefined);
         const preferredEnd = preferredEndColumns.filter(s => type.fieldMap[s] !== undefined);
         const rest = Object.keys(type.fieldMap).filter(s => !preferred.includes(s) && !preferredEnd.includes(s));
+
+        console.log(preferred, preferredEnd, rest);
 
         this.columns = [
             ...preferred, 
@@ -49,7 +55,7 @@ export class ListView
             ...preferredEnd
         ]
         .map(col => type.fieldMap[col])
-        .filter(field => field.isScalar())
+        .filter(field => !!field.type.getType(GrapheneScalarType))
         .map(field => field.name);
 
         this.rows = [];

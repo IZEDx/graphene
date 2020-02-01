@@ -18,13 +18,13 @@ export class GELTable
         return <table class="table">
             <thead>
                 <tr>
-                    { this.columns.map(col => (
+                    { this.columns?.map(col => (
                         <th>{col}</th>
                     )) }
                 </tr>
             </thead>
             <tbody>
-                { this.rows.map((row, idx) => [row, idx]).filter(row => !!row[0]).map(([row, idx]) => this.renderRow(row, idx)) }
+                { this.rows?.map((row, idx) => [row, idx]).filter(row => !!row[0]).map(([row, idx]) => this.renderRow(row, idx)) }
             </tbody>
         </table>;
     }

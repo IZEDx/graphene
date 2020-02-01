@@ -49,11 +49,15 @@ export class EditView
         this.pushBreadcrumb.emit([this.id, this.match.url]);
 
         this.definition = this.graphene.getQuery(this.name).asObject();
+
+        console.log(this.definition);
     }
 
     async componentDidLoad()
     {
         const object = (await this.definition.request({id: this.id}))[this.definition.name];
+
+        console.log("blabla", object);
 
         this.entries = Object.entries(object ?? {})
             .sort((a, b) => {
@@ -99,8 +103,8 @@ export class EditView
                     </div>
                     <gel-form>
                         { this.entries?.map(([key, value]) => {
-                            const field = this.definition.type.fieldMap[key];
-                            return field.type.renderEdit({ 
+                            const field = this.definition.type.getType(GrapheneObjectType)?.fieldMap[key];
+                            return field?.type.renderEdit({ 
                                 formKey: key, 
                                 value, 
                                 label: field.name, 
