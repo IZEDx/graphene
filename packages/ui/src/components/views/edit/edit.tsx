@@ -2,7 +2,7 @@ import { Component, h, Prop, Event, EventEmitter, Watch, State } from "@stencil/
 import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneObjectType, GrapheneQueryField } from "../../../libs/graphene";
+import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType } from "../../../libs/graphene";
 import { pascalCase } from "change-case";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
@@ -24,6 +24,8 @@ export class EditView
 
     @State() definition: GrapheneQueryField<GrapheneObjectType>;
     @State() entries: [string, any][];
+
+    fieldMap: Record<string, GrapheneField>;
 
     get name()
     {
@@ -74,6 +76,10 @@ export class EditView
                 return aIdx > bIdx ? 1 : -1;
             });
 
+        this.fieldMap = this.definition.type.getType(GrapheneObjectType)?.fieldMap;
+
+        console.log("blub", this.fieldMap);
+
         console.log(this.entries);
     }
 
@@ -103,11 +109,12 @@ export class EditView
                     </div>
                     <gel-form>
                         { this.entries?.map(([key, value]) => {
-                            const field = this.definition.type.getType(GrapheneObjectType)?.fieldMap[key];
-                            return field?.type.renderEdit({ 
+                            const {type, name} = this.fieldMap[key];
+                            return type?.renderEdit({ 
                                 formKey: key, 
                                 value, 
-                                label: field.name, 
+                                label: name, 
+                                options: type.getType(GrapheneEnumType)?.values,
                                 disabled: readOnlyColumns.findIndex(v => v === key) > -1
                             })
                         }) }

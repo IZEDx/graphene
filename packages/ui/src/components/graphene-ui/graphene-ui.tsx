@@ -27,7 +27,7 @@ export class GrapheneUI
 
     async componentWillLoad()
     {
-        this.api = new API(this.endPoint, this.token, APIQueries);
+        this.api = new API(this.endPoint, undefined/*this.token*/, APIQueries);
         this.graphene = new Graphene(this.api);
         this.breadcrumb = [[this.endPoint, "/"]];
 

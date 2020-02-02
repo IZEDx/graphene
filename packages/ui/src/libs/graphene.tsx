@@ -1,5 +1,5 @@
 import { GrapheneAPI } from "../global/api";
-import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType } from "graphql";
+import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType, GraphQLEnumType, GraphQLEnumValue } from "graphql";
 import hash from "object-hash";
 import { h } from "@stencil/core";
 
@@ -8,7 +8,7 @@ const log = (..._args: any[]) => {}// console.log("[Graphene]", ..._args);
 const maxScopes = 5;
 const caching = false;
 
-export type Kind = "LIST"|"OBJECT"|"INPUT_OBJECT"|"SCALAR"|"NONNULL"|"UNION"|"UNKNOWN"; 
+export type Kind = "LIST"|"OBJECT"|"INPUT_OBJECT"|"SCALAR"|"NONNULL"|"UNION"|"UNKNOWN"|"ENUM"; 
 
 export class Graphene
 {
@@ -233,13 +233,14 @@ export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputTy
     isScalar =  (): this is GrapheneScalarType  => this.kind === "SCALAR";
     isNonNull = (): this is GrapheneNonNullType => this.kind === "NONNULL";
     isUnion =   (): this is GrapheneUnionType   => this.kind === "UNION";
+    isEnum =    (): this is GrapheneEnumType        => this.kind === "ENUM";
     isUnknown = (): this is GrapheneType        => this.kind === "UNKNOWN";
 
     getType<R extends GrapheneType>(type: Function&{create(...args: any[]): Promise<R>}, c = 5): R|undefined
     {
         if (c < 0) return undefined;
         if (this instanceof type) return this as any;
-        if (this.isNonNull()) return this.ofType.getType(type, c - 1);
+        if (this.isNonNull()) return this.ofType?.getType(type, c - 1);
         if (this.isUnion()) return this.types.map(t => t.getType(type, c - 1)).find(t => t !== undefined);
 
         return undefined;
@@ -444,6 +445,33 @@ export class GrapheneInputObjectType extends GrapheneType
     }
 }
 
+export class GrapheneEnumType extends GrapheneType<GraphQLEnumType>
+{
+    values: GraphQLEnumValue[];
+
+    static async create(type: GraphQLEnumType)
+    {
+        const o = new GrapheneEnumType(type as any);
+        o.values = type.getValues();
+        return o;
+    } 
+
+    toQuery(_c = maxScopes)
+    {
+        return "";
+    }
+
+    renderCell(_val: any)
+    {
+        return "" + (this.values.find(v => v.value === _val)?.name ?? _val);
+    }
+
+    renderEdit(props: any)
+    {
+        return <gel-input-select {...props}></gel-input-select>
+    }
+}
+
 // #endregion
 
 
@@ -458,6 +486,7 @@ export const kindMap = {
     NONNULL: GrapheneNonNullType,
     UNION: GrapheneUnionType,
     INPUT_OBJECT: GrapheneInputObjectType,
+    ENUM: GrapheneEnumType,
     UNKNOWN: GrapheneType
 }
 
@@ -469,6 +498,7 @@ function getKind(type: GraphQLOutputType): Kind
     if (type instanceof GraphQLNonNull) return "NONNULL";
     if (type instanceof GraphQLUnionType) return "UNION";
     if (type instanceof GraphQLInputObjectType) return "INPUT_OBJECT";
+    if (type instanceof GraphQLEnumType) return "ENUM";
 
     return "UNKNOWN";
 }

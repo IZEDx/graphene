@@ -31,6 +31,14 @@ export namespace Components {
     'breadcrumbs': Breadcrumbs;
   }
   interface GelForm {}
+  interface GelInputSelect {
+    'disabled'?: boolean;
+    'formKey': string;
+    'label'?: string;
+    'options': {name: string, value: string}[];
+    'selectClass': string|Record<string, boolean>;
+    'value'?: string;
+  }
   interface GelInputSwitch {
     'disabled'?: boolean;
     'formKey': string;
@@ -95,6 +103,12 @@ declare global {
     new (): HTMLGelFormElement;
   };
 
+  interface HTMLGelInputSelectElement extends Components.GelInputSelect, HTMLStencilElement {}
+  var HTMLGelInputSelectElement: {
+    prototype: HTMLGelInputSelectElement;
+    new (): HTMLGelInputSelectElement;
+  };
+
   interface HTMLGelInputSwitchElement extends Components.GelInputSwitch, HTMLStencilElement {}
   var HTMLGelInputSwitchElement: {
     prototype: HTMLGelInputSwitchElement;
@@ -157,6 +171,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
     'gel-form': HTMLGelFormElement;
+    'gel-input-select': HTMLGelInputSelectElement;
     'gel-input-switch': HTMLGelInputSwitchElement;
     'gel-input-text': HTMLGelInputTextElement;
     'gel-menu': HTMLGelMenuElement;
@@ -177,6 +192,15 @@ declare namespace LocalJSX {
     'breadcrumbs'?: Breadcrumbs;
   }
   interface GelForm {}
+  interface GelInputSelect {
+    'disabled'?: boolean;
+    'formKey'?: string;
+    'label'?: string;
+    'onInputUpdate'?: (event: CustomEvent<{formKey: string, value: any}>) => void;
+    'options'?: {name: string, value: string}[];
+    'selectClass'?: string|Record<string, boolean>;
+    'value'?: string;
+  }
   interface GelInputSwitch {
     'disabled'?: boolean;
     'formKey'?: string;
@@ -241,6 +265,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'gel-breadcrumbs': GelBreadcrumbs;
     'gel-form': GelForm;
+    'gel-input-select': GelInputSelect;
     'gel-input-switch': GelInputSwitch;
     'gel-input-text': GelInputText;
     'gel-menu': GelMenu;
@@ -262,6 +287,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;
       'gel-form': LocalJSX.GelForm & JSXBase.HTMLAttributes<HTMLGelFormElement>;
+      'gel-input-select': LocalJSX.GelInputSelect & JSXBase.HTMLAttributes<HTMLGelInputSelectElement>;
       'gel-input-switch': LocalJSX.GelInputSwitch & JSXBase.HTMLAttributes<HTMLGelInputSwitchElement>;
       'gel-input-text': LocalJSX.GelInputText & JSXBase.HTMLAttributes<HTMLGelInputTextElement>;
       'gel-menu': LocalJSX.GelMenu & JSXBase.HTMLAttributes<HTMLGelMenuElement>;

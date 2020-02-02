@@ -3,28 +3,35 @@
 # !!!   DO NOT MODIFY THIS FILE BY YOURSELF   !!!
 # -----------------------------------------------
 
-input CreateUserInput {
+input CreateGrapheneUserInput {
   name: String!
   password: String!
+  role: GrapheneUserRole!
 }
 
-input LoginUserInput {
+type GrapheneUser {
+  id: ID!
+  name: String!
+  password: String!
+  role: GrapheneUserRole!
+}
+
+enum GrapheneUserRole {
+  ADMIN
+  USER
+}
+
+input LoginGrapheneUserInput {
   name: String!
   password: String!
 }
 
 type Mutation {
-  createUser(data: CreateUserInput!): User!
-  login(data: LoginUserInput!): User!
+  createGrapheneUser(data: CreateGrapheneUserInput!): GrapheneUser!
+  loginGraphene(data: LoginGrapheneUserInput!): GrapheneUser!
 }
 
 type Query {
-  users: [User!]!
-  user(id: String!): User!
-}
-
-type User {
-  id: ID!
-  name: String!
-  password: String!
+  grapheneUsers: [GrapheneUser!]!
+  grapheneUser(id: String!): GrapheneUser!
 }
