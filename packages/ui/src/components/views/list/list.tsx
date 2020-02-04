@@ -32,10 +32,11 @@ export class ListView
     async componentWillLoad()
     {
         this.clearBreadcrumb.emit();
-        const name = this.match.params["name"];
-        this.pushBreadcrumb.emit([name, this.match.url]);
+        this.definition = this.graphene.getQuery(this.match.params["name"]).asList(); 
+        this.pushBreadcrumb.emit([this.definition.name, this.match.url]);
 
-        this.definition = this.graphene.getQuery(name); 
+        if (!this.definition) return;
+
         const list = this.definition.type.ofType;
         const nonnull = list.isList() ? list.ofType : list;
         const type = nonnull.isNonNull() ? nonnull.ofType : nonnull;
@@ -60,14 +61,14 @@ export class ListView
 
         this.rows = [];
         const request = `{
-            ${name} {
+            ${this.definition.name} {
                 ${this.columns.join(" ")}
             }
         }`;
 
         //console.log(request);
 
-        this.values = (await this.api.client.request(request))[name];
+        this.values = (await this.api.client.request(request))[this.definition.name];
 
         for (const idx in this.values)
         {
@@ -88,10 +89,18 @@ export class ListView
         return <segment class="segment">
             <div class="container">
                 <div class="box content has-blur-background">
-                    <h1>{pascalCase(this.definition.name)}</h1>
-                    <p>{ this.definition.description }</p>
-                    <br />
-                    <gel-table columns={this.columns} rows={this.rows} linkTo={(_, idx) => this.linkTo(idx)}></gel-table>
+                    { !this.definition
+                        ? [
+                            <h1>404</h1>,
+                            <p>View '{this.match.params["name"]}' not found.</p>
+                        ]
+                        : [
+                            <h1>{pascalCase(this.definition.name)}</h1>,
+                            <p>{ this.definition.description }</p>,
+                            <br />,
+                            <gel-table columns={this.columns} rows={this.rows} linkTo={(_, idx) => this.linkTo(idx)}></gel-table>
+                        ]
+                    }
                 </div>
             </div>
         </segment>;

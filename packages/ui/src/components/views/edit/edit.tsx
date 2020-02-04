@@ -24,6 +24,7 @@ export class EditView
 
     @State() definition: GrapheneQueryField<GrapheneObjectType>;
     @State() entries: [string, any][];
+    @State() failed = false;
 
     fieldMap: Record<string, GrapheneField>;
 
@@ -50,75 +51,89 @@ export class EditView
         this.pushBreadcrumb.emit([this.name, this.match.url]);
         this.pushBreadcrumb.emit([this.id, this.match.url]);
 
-        this.definition = this.graphene.getQuery(this.name).asObject();
-
-        console.log(this.definition);
+        this.definition = this.graphene.getQuery(this.name)?.asObject();
+        if (!this.id || !this.definition) this.failed = true;
     }
 
     async componentDidLoad()
     {
-        const object = (await this.definition.request({id: this.id}))[this.definition.name];
-
-        console.log("blabla", object);
-
-        this.entries = Object.entries(object ?? {})
-            .sort((a, b) => {
-                const aIdx = preferredColumns.findIndex((k) => k === a[0]);
-                const bIdx = preferredColumns.findIndex((k) => k === b[0]);
-
-                if (aIdx === -1 && bIdx !== -1)
-                    return 1;
-                if (aIdx !== -1 && bIdx === -1)
-                    return -1;
-                if (aIdx === -1 && bIdx === -1)
-                    return 0;
-
-                return aIdx > bIdx ? 1 : -1;
-            });
-
-        this.fieldMap = this.definition.type.getType(GrapheneObjectType)?.fieldMap;
-
-        console.log("blub", this.fieldMap);
-
-        console.log(this.entries);
+        if (this.failed) return;
+        
+        try
+        {
+            const object = (await this.definition.request({id: this.id}))?.[this.definition.name];
+        
+            this.entries = Object.entries(object)
+                .sort((a, b) => {
+                    const aIdx = preferredColumns.findIndex((k) => k === a[0]);
+                    const bIdx = preferredColumns.findIndex((k) => k === b[0]);
+    
+                    if (aIdx === -1 && bIdx !== -1)
+                        return 1;
+                    if (aIdx !== -1 && bIdx === -1)
+                        return -1;
+                    if (aIdx === -1 && bIdx === -1)
+                        return 0;
+    
+                    return aIdx > bIdx ? 1 : -1;
+                });
+    
+            this.fieldMap = this.definition.type.getType(GrapheneObjectType)?.fieldMap;
+        }
+        catch(e)
+        {
+            this.failed = true;
+        }
+        
     }
 
-    render()
+    render() 
     {
 
         return <segment class="segment">
             <div class="container">
                 <div class="box has-blur-background">
-                    <div class="level">
-                        <div class="level-left">
-                            <div class="level-item content">
-                                <h2>
-                                    <stencil-route-link url={"/"+this.name}>
-                                        &lt; Back
-                                    </stencil-route-link>
-                                    &nbsp;&nbsp;&nbsp;
-                                    {pascalCase(this.definition.name)}
-                                </h2>
-                            </div>
-                        </div>
-                        <div class="level-right">
-                            <div class="level-item">
-                                <button class="button is-primary">Save</button>
-                            </div>
-                        </div>
-                    </div>
-                    <gel-form>
-                        { this.entries?.map(([key, value]) => {
-                            const {type, name} = this.fieldMap[key];
-                            return type?.renderEdit({ 
-                                formKey: key, 
-                                value, 
-                                label: name, 
-                                options: type.getType(GrapheneEnumType)?.values,
-                                disabled: readOnlyColumns.findIndex(v => v === key) > -1
-                            })
-                        }) }
-                    </gel-form>
+                    { this.failed
+                        ? [
+                            <h1>404</h1>,
+                            <p>{this.definition 
+                                ? `${pascalCase(this.definition.name)} '${this.id}' not found.` 
+                                : `View '${this.name}' not found.`
+                            }</p>
+                        ]
+                        : [
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item content">
+                                        <h2>
+                                            <stencil-route-link url={"/"+this.name}>
+                                                &lt; Back
+                                            </stencil-route-link>
+                                            &nbsp;&nbsp;&nbsp;
+                                            {pascalCase(this.name)}
+                                        </h2>
+                                    </div>
+                                </div>
+                                <div class="level-right">
+                                    <div class="level-item">
+                                        <button class="button is-primary">Save</button>
+                                    </div>
+                                </div>
+                            </div>,
+                            <gel-form>
+                                { this.entries?.map(([key, value]) => {
+                                    const {type, name} = this.fieldMap[key];
+                                    return type?.renderEdit({ 
+                                        formKey: key, 
+                                        value, 
+                                        label: name, 
+                                        options: type.getType(GrapheneEnumType)?.values,
+                                        disabled: readOnlyColumns.findIndex(v => v === key) > -1
+                                    })
+                                }) }
+                            </gel-form>
+                        ]
+                    }
                 </div>
             </div>
         </segment>;

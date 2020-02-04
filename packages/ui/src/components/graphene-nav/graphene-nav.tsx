@@ -28,6 +28,12 @@ export class GrapheneNav
                         url: "/",
                         children: [],
                         exact: true
+                    },
+                    {
+                        name: "Account",
+                        url: "/user/",
+                        children: [],
+                        exact: true
                     }
                 ]
             },

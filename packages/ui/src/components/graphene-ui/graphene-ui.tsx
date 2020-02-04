@@ -84,7 +84,7 @@ export class GrapheneUI
                                 <span class="navbar-item is-hidden-mobile">
                                     <gel-breadcrumbs breadcrumbs={this.breadcrumb}></gel-breadcrumbs>
                                 </span> 
-                                <span role="button" class="navbar-burger burger" aria-label="menu" aria-expanded={this.isExpanded} onClick={() => this.isExpanded = !this.isExpanded}>
+                                <span role="button" class="navbar-burger burger is-hidden-tablet" aria-label="menu" aria-expanded={this.isExpanded} onClick={() => this.isExpanded = !this.isExpanded}>
                                     <span aria-hidden="true"></span>
                                     <span aria-hidden="true"></span> 
                                     <span aria-hidden="true"></span>

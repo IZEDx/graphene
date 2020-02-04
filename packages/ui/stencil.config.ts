@@ -11,6 +11,10 @@ export const config: Config = {
       esmLoaderPath: '../loader',
     },
     {
+      type: "docs",
+      dir: "docs",
+    },
+    {
       type: 'www',
       serviceWorker: null, // disable service workers
     }
