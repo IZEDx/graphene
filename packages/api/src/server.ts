@@ -5,13 +5,14 @@ import compression from 'compression';
 import cors from 'cors';
 import { buildSchema, AuthChecker } from 'type-graphql';
 import { GraphQLSchema } from 'graphql';
-import GrapheneUserResolver from './resolvers/GrapheneUserResolver';
+import UserResolver from './resolvers/UserResolver';
 import { createConnection, Connection, EntitySchema, ConnectionOptions } from 'typeorm';
 import { join } from "path";
-import GrapheneUser from './models/GrapheneUser';
+import User from './models/User';
 import { readFile } from 'fs';
 import jwt from "express-jwt";
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
+import { UserRole } from './models/enums/UserRole';
 
 const www = join(__dirname, "..", "..", "ui", "www");
 const indexHtml = join(www, "index.html");
@@ -31,6 +32,7 @@ export interface GrapheneOptions
     port?: number;
     hostname?: string;
     secret?: string;
+    adminPassword?: string;
 }
 
 export class GrapheneServer
@@ -39,7 +41,7 @@ export class GrapheneServer
     private constructor(
         public options: GrapheneOptions,
         public schema: GraphQLSchema,
-        public apollo: ApolloServer,
+        public apollo: ApolloServer, 
         public express: Express,
         public orm: Connection
     ){}
@@ -50,12 +52,12 @@ export class GrapheneServer
         const connection = await createConnection(Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [GrapheneUser, ...(opts?.entities ?? [])],
+            entities: [User, ...(opts?.entities ?? [])],
             synchronize: true
         }, opts?.connection));
 
         const schema = await buildSchema({
-            resolvers: [GrapheneUserResolver, ...(opts?.resolvers ?? [])],
+            resolvers: [UserResolver, ...(opts?.resolvers ?? [])],
             emitSchemaFile: true,
             authChecker: GrapheneServer.authChecker
         });
@@ -84,14 +86,33 @@ export class GrapheneServer
                 res.send(data.toString());
             });
         });
+
+        await this.createAdminUser(opts?.adminPassword);
         
         return new GrapheneServer(opts ?? {}, schema, apollo, app, connection);
+    }
+
+
+    private static async createAdminUser(overridePw?: string)
+    {
+        let adminUser = await User.findOne({where: {name: "admin"}});
+        if (!adminUser)
+        {
+            adminUser = User.create({name: "admin", role: UserRole.ADMIN, password: "admin"})
+        }
+        
+        if (overridePw)
+        {
+            adminUser.password = overridePw;
+        }
+
+        return adminUser.save();
     }
 
     private static authChecker: AuthChecker<GrapheneContext> = 
     async ({ root, args, context, info }, roles) => 
     {
-        const user = await GrapheneUser.findOne(context.user.id);
+        const user = await User.findOne(context.user.id);
         if (user) {
             return roles.length === 0 || roles.includes(user.role);
         }

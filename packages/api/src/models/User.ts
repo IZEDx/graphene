@@ -1,10 +1,10 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
 import { Field, Int, ObjectType, ID,  } from "type-graphql";
-import { GrapheneUserRole } from "./enums/GrapheneUserRole";
+import { UserRole } from "./enums/UserRole";
 
 @ObjectType()
 @Entity()
-export default class GrapheneUser extends BaseEntity
+export default class User extends BaseEntity
 {
     @PrimaryGeneratedColumn()
     @Field(type => ID)
@@ -19,6 +19,6 @@ export default class GrapheneUser extends BaseEntity
     password: string;
 
     @Column("varchar")
-    @Field(type => GrapheneUserRole)
-    role: GrapheneUserRole;
+    @Field(type => UserRole)
+    role: UserRole;
 }   
