@@ -67,8 +67,10 @@ export namespace Components {
   interface GelTable {
     'columns': string[];
     'history': RouterHistory;
-    'linkTo'?: (row: any, idx: number) => any;
+    'linkTo'?: (row: any) => any;
+    'order': "ASC"|"DESC";
     'rows': any[];
+    'sortBy': string;
   }
   interface GrapheneNav {}
   interface GrapheneUi {
@@ -240,8 +242,10 @@ declare namespace LocalJSX {
   interface GelTable {
     'columns'?: string[];
     'history'?: RouterHistory;
-    'linkTo'?: (row: any, idx: number) => any;
+    'linkTo'?: (row: any) => any;
+    'order'?: "ASC"|"DESC";
     'rows'?: any[];
+    'sortBy'?: string;
   }
   interface GrapheneNav {}
   interface GrapheneUi {

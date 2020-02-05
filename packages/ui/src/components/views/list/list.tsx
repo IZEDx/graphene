@@ -3,7 +3,7 @@ import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { pascalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneField, GrapheneListType, GrapheneObjectType, GrapheneScalarType } from "../../../libs/graphene";
+import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneScalarType, GrapheneQueryField } from "../../../libs/graphene";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const preferredEndColumns = ["created_at", "updated_at"];
@@ -20,7 +20,7 @@ export class ListView
     @Prop() match: MatchResults;
     @Prop() columnCount = 8;
 
-    @State() definition: GrapheneField<GrapheneListType>;
+    @State() definition: GrapheneQueryField<GrapheneListType>;
     @State() columns: string[];
     @State() rows: any[] = [];
     @State() values: any[] = [];
@@ -78,6 +78,7 @@ export class ListView
                 console.log("Rendering ", col, val, cellType, cellType.renderCell(val));
 
                 this.rows[idx] = this.rows[idx] ?? {};
+                this.rows[idx]["_idx"] = idx;
                 this.rows[idx][col] = () => cellType.renderCell(val);
             }
         }
@@ -98,7 +99,7 @@ export class ListView
                             <h1>{pascalCase(this.definition.name)}</h1>,
                             <p>{ this.definition.description }</p>,
                             <br />,
-                            <gel-table columns={this.columns} rows={this.rows} linkTo={(_, idx) => this.linkTo(idx)}></gel-table>
+                            <gel-table columns={this.columns} rows={this.rows} linkTo={(row) => this.linkTo(row["_idx"])}></gel-table>
                         ]
                     }
                 </div>

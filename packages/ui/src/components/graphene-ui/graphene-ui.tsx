@@ -79,7 +79,7 @@ export class GrapheneUI
                     <graphene-nav></graphene-nav>
 
                     <div class="dashboard-main">
-                        <nav class="navbar has-blur-background">
+                        <nav class="navbar">
                             <div class="navbar-brand">
                                 <span class="navbar-item is-hidden-mobile">
                                     <gel-breadcrumbs breadcrumbs={this.breadcrumb}></gel-breadcrumbs>

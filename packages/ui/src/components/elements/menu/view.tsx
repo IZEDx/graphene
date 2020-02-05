@@ -31,7 +31,8 @@ export class GELMenu
                 </p>,
                 <ul class={mergeClass("menu-list", this.listClass)}>
                     {...items.map(item => this.renderMenuItem(item))}
-                </ul>
+                </ul>,
+                <div class="spacer">&nbsp;</div>
             ])) }
         </aside>;  
     }

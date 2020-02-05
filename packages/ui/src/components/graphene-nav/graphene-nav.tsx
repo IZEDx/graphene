@@ -30,8 +30,8 @@ export class GrapheneNav
                         exact: true
                     },
                     {
-                        name: "Account",
-                        url: "/user/1",
+                        name: "My Account",
+                        url: "/users/1",
                         children: [],
                         exact: true
                     },

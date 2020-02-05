@@ -46,59 +46,16 @@ body {
   height: 5px;
 }
 
-.modal-background {
-    backdrop-filter: blur(15px);
-}
-
 .dashboard-panel
 {
   //backdrop-filter: blur(15px);
   background-color: $background;
-  min-width: 300px;
-
-  @media screen and (max-width: 1024px) {
-    min-width: 220px;
-  }
 }
 
 .dashboard-main > .body
 {
   background-color: rgba(0,0,0, 0.6);
-
-  segment.segment
-  {
-    width: 100%;
-    display: block;
-    @media screen and (min-width: 1024px) {
-      padding-top: 40px;
-    }
-  }
 }
-
-.no-padding {
-  padding: 0;
-}
-
-.is-flex-center {
-    display: flex;
-    align-items: center;
-}
-
-.is-flex-stretch {
-    display: flex;
-    align-items: stretch;
-}
-
-.is-fullheight {
-  height: 100%;
-}
-
-.clickable {  
-  cursor: pointer;
-} 
-.flex-grow {
-    flex-grow: 1;
-} 
 
 .box {
   border-radius: 0;
@@ -107,4 +64,45 @@ body {
 .has-blur-background
 {
   backdrop-filter: blur(15px);
+}
+
+
+gel-table
+{
+  .table-cell
+  {
+    border-bottom: 1px solid rgba(255,255,255,0.1);
+    border-left: 1px solid rgba(0,0,0,0);
+    border-right: 1px solid rgba(0,0,0,0);
+    border-top: 1px solid rgba(0,0,0,0);
+
+    &:hover
+    {
+      border-left: 1px solid rgba(255,255,255,0.1);
+      border-right: 1px solid rgba(255,255,255,0.1);
+    }
+
+    &.is-header
+    {
+      text-transform: uppercase;
+      font-weight: bold;
+
+      &:hover
+      {
+        border-top: 1px solid rgba(255,255,255,0.1);
+      }
+    }
+
+    &.is-actions
+    {
+      display: flex;
+      flex-direction: row-reverse;
+      
+      &>.gap
+      {
+          display: block;
+          width: 0.5rem;
+      }
+    }
+  }
 }

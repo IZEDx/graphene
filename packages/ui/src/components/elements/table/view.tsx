@@ -1,4 +1,4 @@
-import { Component, h, Prop } from "@stencil/core";
+import { Component, h, Prop, Host } from "@stencil/core";
 import { RouterHistory, injectHistory } from "@stencil/router";
 
 @Component({
@@ -9,9 +9,94 @@ export class GELTable
 {
     @Prop() columns: string[];
     @Prop() rows: any[];
-    @Prop() linkTo?: (row: any, idx: number) => any
+    @Prop() linkTo?: (row: any) => any
     @Prop() history: RouterHistory;
     
+    @Prop({mutable: true}) sortBy = "id";
+    @Prop({mutable: true}) order: "ASC"|"DESC" = "ASC";
+
+    render()
+    {
+        if (!this.columns.includes(this.sortBy)) this.sortBy = this.columns[0];
+        if (!this.sortBy || this.order !== "ASC" && this.order !== "DESC") return "WTF";
+
+        const rows = this.rows
+            .filter(row => !!row)
+            .sort(this.sortRows)
+            .map((row, idx) => [row, idx]);
+
+        return <Host>
+            { this.columns?.map(this.renderHeader) }
+            { this.renderHeader("") }
+            { rows.map(this.renderRow) }
+        </Host>
+    }
+
+    sortRows = (a: any, b: any) =>
+    {
+        const av = this.renderValue(a[this.sortBy]);
+        const bv = this.renderValue(b[this.sortBy]);
+        return this.order === "ASC" && av > bv || this.order === "DESC" && (bv > av || av === undefined)
+            ? 1
+            : -1;
+    }
+
+    renderHeader = (col: string) => 
+    (
+        <div class="table-cell is-header clickable"
+            onClick={() => {
+                if (this.sortBy === col)
+                {
+                    this.order = this.order === "ASC" ? "DESC" : "ASC";
+                }
+                else
+                {
+                    this.sortBy = col;
+                }
+            }}
+        >
+            {col}
+            <span class={{
+                "sort-indicator": true,
+                "is-active": this.sortBy === col
+            }}>
+            { this.order === "ASC"
+                ? <ion-icon name="arrow-dropup"></ion-icon>
+                : <ion-icon name="arrow-dropdown"></ion-icon>
+            }
+            </span>
+        </div>
+    )
+
+    goto = (row: any) => () =>
+    {
+        const link = this.linkTo?.(row);
+        console.log(link);
+        if (link) this.history.push(link, {});
+    }
+
+    onClick={}
+
+    renderRow = ([row, idx]: [any, number]) => 
+    [
+        ...this.columns.map(col => 
+        (
+            <div class="table-cell clickable" onClick={this.goto(row)} style={{"grid-row": idx + 2 + ""}}>{this.renderValue(row[col])}</div>
+        )),
+        <div class="table-cell is-actions" style={{"grid-row": idx + 2 + ""}}>
+            <button class="button is-small is-warning" onClick={this.goto(row)}>
+                <ion-icon name="create"></ion-icon>
+            </button>
+            <div class="gap"></div>
+            <button class="button is-small is-danger">
+                <ion-icon name="trash"></ion-icon>
+            </button>
+        </div>
+    ]
+
+
+    renderValue = (v: any) => v instanceof Function ? v() : v;
+    /*
     render()
     {
 
@@ -40,6 +125,8 @@ export class GELTable
             ))}
         </tr>;
     }
+    */
+
 }
 
 injectHistory(GELTable);

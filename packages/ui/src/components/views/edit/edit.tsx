@@ -48,6 +48,7 @@ export class EditView
 
     async componentWillLoad()
     {
+        this.clearBreadcrumb.emit();
         this.pushBreadcrumb.emit([this.name, this.match.url]);
         this.pushBreadcrumb.emit([this.id, this.match.url]);
 
@@ -119,19 +120,29 @@ export class EditView
                         : [
                             <div class="level">
                                 <div class="level-left">
-                                    <div class="level-item content">
-                                        <h2>
-                                            <stencil-route-link url={"/"+this.name}>
-                                                &lt; Back
-                                            </stencil-route-link>
-                                            &nbsp;&nbsp;&nbsp;
-                                            {pascalCase(this.name)}
-                                        </h2>
+                                    <div class="level-item">
+                                        <stencil-route-link url={"/"+this.name}>
+                                            <button class="button is-outlined">
+                                                <ion-icon name="return-left"></ion-icon>
+                                            </button>
+                                        </stencil-route-link>
+                                    </div>
+                                    <div class="level-item">
+                                        <p class="subtitle is-5">
+                                            <strong>{pascalCase(this.name)}</strong>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="level-right">
                                     <div class="level-item">
-                                        <button class="button is-primary" onClick={() => this.onSave()}>Save</button>
+                                        <button class="button is-danger" onClick={() => this.onSave()}>
+                                            <ion-icon name="trash"></ion-icon>
+                                        </button>
+                                    </div>
+                                    <div class="level-item">
+                                        <button class="button is-success" onClick={() => this.onSave()}>
+                                            <ion-icon name="save"></ion-icon>
+                                        </button>
                                     </div>
                                 </div>
                             </div>,
