@@ -220,6 +220,23 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         console.log(query);
         return this.graphene.api.client.request<T>(query);
     }
+
+    async create(data: any)
+    {
+        if (!this.createMutation) return;
+
+        const args = this.createMutation.args;
+        console.log("create args", args);
+        const arg = args.find(arg => arg.type.getType(GrapheneInputObjectType));
+        const dataType = arg.type.getType(GrapheneInputObjectType);
+
+        const query = `mutation {
+            ${this.createMutation.name}(${arg.name}: ${dataType.toArgument(data)}) ${this.type.toQuery()}
+        }`;
+        
+        console.log(query);
+        return this.graphene.api.client.request<T>(query);
+    }
 }
 
 // #endregion

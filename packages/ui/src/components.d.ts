@@ -80,6 +80,9 @@ export namespace Components {
   interface UtilRouteListener {
     'props': RouteRenderProps | undefined;
   }
+  interface ViewCreate {
+    'match': MatchResults;
+  }
   interface ViewDashboard {}
   interface ViewEdit {
     'match': MatchResults;
@@ -154,6 +157,12 @@ declare global {
     new (): HTMLUtilRouteListenerElement;
   };
 
+  interface HTMLViewCreateElement extends Components.ViewCreate, HTMLStencilElement {}
+  var HTMLViewCreateElement: {
+    prototype: HTMLViewCreateElement;
+    new (): HTMLViewCreateElement;
+  };
+
   interface HTMLViewDashboardElement extends Components.ViewDashboard, HTMLStencilElement {}
   var HTMLViewDashboardElement: {
     prototype: HTMLViewDashboardElement;
@@ -188,6 +197,7 @@ declare global {
     'graphene-nav': HTMLGrapheneNavElement;
     'graphene-ui': HTMLGrapheneUiElement;
     'util-route-listener': HTMLUtilRouteListenerElement;
+    'view-create': HTMLViewCreateElement;
     'view-dashboard': HTMLViewDashboardElement;
     'view-edit': HTMLViewEditElement;
     'view-list': HTMLViewListElement;
@@ -259,6 +269,11 @@ declare namespace LocalJSX {
     'onPageWillUpdate'?: (event: CustomEvent<LocationSegments>) => void;
     'props'?: RouteRenderProps | undefined;
   }
+  interface ViewCreate {
+    'match'?: MatchResults;
+    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
+  }
   interface ViewDashboard {
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
@@ -288,6 +303,7 @@ declare namespace LocalJSX {
     'graphene-nav': GrapheneNav;
     'graphene-ui': GrapheneUi;
     'util-route-listener': UtilRouteListener;
+    'view-create': ViewCreate;
     'view-dashboard': ViewDashboard;
     'view-edit': ViewEdit;
     'view-list': ViewList;
@@ -311,6 +327,7 @@ declare module "@stencil/core" {
       'graphene-nav': LocalJSX.GrapheneNav & JSXBase.HTMLAttributes<HTMLGrapheneNavElement>;
       'graphene-ui': LocalJSX.GrapheneUi & JSXBase.HTMLAttributes<HTMLGrapheneUiElement>;
       'util-route-listener': LocalJSX.UtilRouteListener & JSXBase.HTMLAttributes<HTMLUtilRouteListenerElement>;
+      'view-create': LocalJSX.ViewCreate & JSXBase.HTMLAttributes<HTMLViewCreateElement>;
       'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
       'view-edit': LocalJSX.ViewEdit & JSXBase.HTMLAttributes<HTMLViewEditElement>;
       'view-list': LocalJSX.ViewList & JSXBase.HTMLAttributes<HTMLViewListElement>;

@@ -3,14 +3,15 @@ import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { pascalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneScalarType, GrapheneQueryField } from "../../../libs/graphene";
+import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneScalarType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
+import { GraphQLOutputType } from "graphql";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const preferredEndColumns = ["created_at", "updated_at"];
 
 @Component({
     tag: 'view-list',
-    //styleUrl: 'view-list.scss',
+    styleUrl: 'style.scss',
 })
 export class ListView 
 {
@@ -24,6 +25,8 @@ export class ListView
     @State() columns: string[];
     @State() rows: any[] = [];
     @State() values: any[] = [];
+
+    fieldMap: Record<string, GrapheneField<GrapheneType<GraphQLOutputType>>>;
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
@@ -42,11 +45,13 @@ export class ListView
         const type = nonnull.isNonNull() ? nonnull.ofType : nonnull;
 
         console.log(type);
+
         if (!(type instanceof GrapheneObjectType)) return;
+        this.fieldMap = type.fieldMap;
         
-        const preferred = preferredColumns.filter(s => type.fieldMap[s] !== undefined);
-        const preferredEnd = preferredEndColumns.filter(s => type.fieldMap[s] !== undefined);
-        const rest = Object.keys(type.fieldMap).filter(s => !preferred.includes(s) && !preferredEnd.includes(s));
+        const preferred = preferredColumns.filter(s => this.fieldMap[s] !== undefined);
+        const preferredEnd = preferredEndColumns.filter(s => this.fieldMap[s] !== undefined);
+        const rest = Object.keys(this.fieldMap).filter(s => !preferred.includes(s) && !preferredEnd.includes(s));
 
         console.log(preferred, preferredEnd, rest);
 
@@ -55,11 +60,10 @@ export class ListView
             ...rest.slice(0, this.columnCount - preferred.length - preferredEnd.length),
             ...preferredEnd
         ]
-        .map(col => type.fieldMap[col])
+        .map(col => this.fieldMap[col])
         .filter(field => !!field.type.getType(GrapheneScalarType))
         .map(field => field.name);
 
-        this.rows = [];
         const request = `{
             ${this.definition.name} {
                 ${this.columns.join(" ")}
@@ -70,35 +74,76 @@ export class ListView
 
         this.values = (await this.api.client.request(request))[this.definition.name];
 
+        this.updateRows();
+    }
+
+    updateRows(searchBy?: string)
+    {
+        this.rows = [];
+        let c = 0;
         for (const idx in this.values)
         {
+            let checksFilter = false;
             for (const [col, val] of Object.entries(this.values[idx]))
             {
-                const cellType = type.fieldMap[col].type;
+                const cellType = this.fieldMap[col].type;
                 console.log("Rendering ", col, val, cellType, cellType.renderCell(val));
+                if (!searchBy || cellType.renderCell(val).toString().includes(searchBy)) checksFilter = true;
 
-                this.rows[idx] = this.rows[idx] ?? {};
-                this.rows[idx]["_idx"] = idx;
-                this.rows[idx][col] = () => cellType.renderCell(val);
+                this.rows[c] = this.rows[c] ?? {};
+                this.rows[c]["_idx"] = idx;
+                this.rows[c][col] = () => cellType.renderCell(val);
             }
+            if (!checksFilter) delete this.rows[c];
+            c++;
         }
+    }
+
+    onSearchInput(e: KeyboardEvent)
+    {
+        const el = e.target as HTMLInputElement;
+        this.updateRows(el.value);
     }
 
     render()
     {
 
         return <segment class="segment">
-            <div class="container">
-                <div class="box content has-blur-background">
+            <div class="container is-fullheight">
+                <div class="box content is-fullheight has-blur-background">
                     { !this.definition
                         ? [
                             <h1>404</h1>,
                             <p>View '{this.match.params["name"]}' not found.</p>
                         ]
                         : [
-                            <h1>{pascalCase(this.definition.name)}</h1>,
-                            <p>{ this.definition.description }</p>,
-                            <br />,
+                            <div class="level">
+                                <div class="level-left">
+                                    <div class="level-item content">
+                                        <h2>
+                                            <strong>{pascalCase(this.definition.name)}</strong>
+                                        </h2>
+                                        <p class="subtitle is-5">{ this.definition.description }</p>
+                                    </div>
+                                </div>
+                                <div class="level-right list-controls">
+                                    <div class="level-item">
+                                        <input 
+                                            class="input"
+                                            type="text"
+                                            placeholder="Search..." 
+                                            onKeyUp={e => this.onSearchInput(e)}
+                                        />
+                                    </div>
+                                    <div class="level-item">
+                                        <stencil-route-link url={"/"+this.definition.name+"/new"}>
+                                            <button class="button is-success">
+                                                <ion-icon name="add-circle-outline"></ion-icon>
+                                            </button>
+                                        </stencil-route-link>
+                                    </div>
+                                </div>
+                            </div>,
                             <gel-table columns={this.columns} rows={this.rows} linkTo={(row) => this.linkTo(row["_idx"])}></gel-table>
                         ]
                     }

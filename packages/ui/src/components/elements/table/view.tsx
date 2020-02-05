@@ -34,8 +34,15 @@ export class GELTable
 
     sortRows = (a: any, b: any) =>
     {
-        const av = this.renderValue(a[this.sortBy]);
-        const bv = this.renderValue(b[this.sortBy]);
+        let av = this.renderValue(a[this.sortBy]);
+        let bv = this.renderValue(b[this.sortBy]);
+        
+        if (!isNaN(parseFloat(av)) && !isNaN(parseFloat(bv)))
+        {
+            av = parseFloat(av);
+            bv = parseFloat(bv);
+        }
+
         return this.order === "ASC" && av > bv || this.order === "DESC" && (bv > av || av === undefined)
             ? 1
             : -1;
