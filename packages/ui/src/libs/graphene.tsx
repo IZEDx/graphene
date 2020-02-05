@@ -1,9 +1,15 @@
 import { GrapheneAPI } from "../global/api";
-import { GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType, GraphQLEnumType, GraphQLEnumValue } from "graphql";
+import { 
+    GraphQLSchema, buildClientSchema, GraphQLField, GraphQLList, 
+    GraphQLOutputType, GraphQLObjectType, GraphQLFieldMap, GraphQLScalarType, 
+    GraphQLArgument, GraphQLNonNull, GraphQLUnionType, GraphQLInputObjectType, 
+    GraphQLEnumType, GraphQLEnumValue, GraphQLInputType 
+} from "graphql";
 import hash from "object-hash";
 import { h } from "@stencil/core";
+import { pascalCase } from "change-case";
 
-const log = (..._args: any[]) => {}// console.log("[Graphene]", ..._args);
+const log = (..._args: any[]) => {}//console.log("[Graphene]", ..._args);
 
 const maxScopes = 5;
 const caching = false;
@@ -18,8 +24,8 @@ export class Graphene
     queryFields: GrapheneQueryField<GrapheneType<any>>[] = [];
     queryFieldMap: Record<string, GrapheneQueryField<GrapheneType<any>>> = {};
 
-    mutationFields: GrapheneQueryField<GrapheneInputObjectType>[] = [];
-    mutationFieldMap: Record<string, GrapheneQueryField<GrapheneInputObjectType>> = {};
+    mutationFields: GrapheneField<GrapheneInputObjectType>[] = [];
+    mutationFieldMap: Record<string, GrapheneField<GrapheneInputObjectType>> = {};
 
     constructor(public api: GrapheneAPI)
     {}
@@ -28,14 +34,23 @@ export class Graphene
     {
         log("Loading");
         this.schema = buildClientSchema(await this.api.query("introspect"));
-        const fields = this.schema.getQueryType().getFields();
+
+        log("Analyzing mutation fields");
+        const mutationFields = this.schema.getMutationType().getFields();
+        for (const [k, f] of Object.entries(mutationFields))
+        {
+            this.mutationFields.push(await GrapheneField.create(k, f));
+        }
+        this.mutationFieldMap = this.mutationFields.reduce((a, b) => ({...a, [b.name]: b}), {});
         
         log("Analyzing query fields");
-        for (const [k, f] of Object.entries(fields))
+        const queryFields = this.schema.getQueryType().getFields();
+        for (const [k, f] of Object.entries(queryFields))
         {
             this.queryFields.push(await GrapheneQueryField.create(k, f, this));
         }
         this.queryFieldMap = this.queryFields.reduce((a, b) => ({...a, [b.name]: b}), {});
+
 
         log("Done")
 
@@ -47,7 +62,7 @@ export class Graphene
         return this.queryFieldMap[name] as any;
     }
 
-    getMutation<T extends GrapheneInputObjectType>(name: string): GrapheneQueryField<T>|undefined
+    getMutation<T extends GrapheneInputObjectType>(name: string): GrapheneField<T>|undefined
     {
         return this.mutationFieldMap[name] as any;
     }
@@ -90,10 +105,10 @@ export class GrapheneField<T extends GrapheneType<GraphQLOutputType> = GrapheneT
         log("Analyzing type of Field", name)
         field.type = await GrapheneType.create(_field.type as any) as any;
 
-        log("Analyzing args of Field", name);
-        for (const a of _field.args)
+        log("Analyzing args of Field", name, _field.args);
+        for (const a of (_field.args ?? []))
         {
-            field.args.push({...a, type: await GrapheneType.create(a.type as any)} as any);
+            field.args.push(await GrapheneArgument.create(a));
         }
 
         log(name, "created");
@@ -104,7 +119,8 @@ export class GrapheneField<T extends GrapheneType<GraphQLOutputType> = GrapheneT
     isObject = (): this is GrapheneField<GrapheneObjectType> => this.type?.isObject();
     isScalar = (): this is GrapheneField<GrapheneScalarType> => this.type?.isScalar();
     isNonNull = (): this is GrapheneField<GrapheneNonNullType> => this.type?.isNonNull();
-    isUnion = (): this is GrapheneField<any> => this.type?.isUnion();
+    isUnion = (): this is GrapheneField<GrapheneUnionType> => this.type?.isUnion();
+    isEnum = (): this is GrapheneField<GrapheneEnumType> => this.type?.isEnum();
     isUnknown = (): this is GrapheneField<any> => this.type?.isUnknown();
 
     static async fromFieldMap(fields: GraphQLFieldMap<any, any, {
@@ -135,18 +151,26 @@ export class GrapheneField<T extends GrapheneType<GraphQLOutputType> = GrapheneT
 export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = GrapheneType<GraphQLOutputType>> extends GrapheneField<T>
 {
     graphene: Graphene;
+    editMutation?: GrapheneField<GrapheneInputObjectType>;
+    createMutation?: GrapheneField<GrapheneInputObjectType>;
+    deleteMutation?: GrapheneField<GrapheneInputObjectType>;
 
     static async create<T extends GrapheneField>(name: string, _field: GraphQLField<any, any>, graphene?: any): Promise<T>
     {
         const result = await super.create<GrapheneQueryField>(name, _field, new GrapheneQueryField(name, _field) as any);
         result.graphene = graphene;
 
-        log("Analyzing mutations of QueryField")
+        const objectName = pascalCase(result.asObject().name);
+        log("Analyzing mutations of QueryField", objectName);
+        console.log("edit"+objectName, result.graphene.mutationFieldMap);
+        result.editMutation = result.graphene.getMutation("edit"+objectName);
+        result.createMutation = result.graphene.getMutation("create"+objectName);
+        result.deleteMutation = result.graphene.getMutation("delete"+objectName);
 
         return result as any;
     }
 
-    async request<T = any>(args?: Record<string, string|number>)
+    async request<T = any>(args?: Record<string, string|number>, mutation = false)
     {
         const fields = this.type.isObject() && this.type.fieldMap;
         const argStr = args ? `(${Object.entries(args).map(([k, v]) => 
@@ -157,7 +181,7 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
             return  `${k}: ` + (quoted ? `"${v}"` : v);
         }).join(", ")})` : "";
         
-        const query = `{
+        const query = `${mutation ? "mutation " : ""}{
             ${this.name}${argStr} ${this.type.toQuery()}
         }`;
         
@@ -179,13 +203,30 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         if (obj) return obj as any;
         return this as any;
     }
+
+    async edit(data: any)
+    {
+        if (!this.editMutation) return;
+
+        const args = this.editMutation.args;
+        console.log("edit args", args);
+        const arg = args.find(arg => arg.type.getType(GrapheneInputObjectType));
+        const dataType = arg.type.getType(GrapheneInputObjectType);
+
+        const query = `mutation {
+            ${this.editMutation.name}(${arg.name}: ${dataType.toArgument(data)}) ${this.type.toQuery()}
+        }`;
+        
+        console.log(query);
+        return this.graphene.api.client.request<T>(query);
+    }
 }
 
 // #endregion
 
 // #region GrapheneType
 
-export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputType>
+export abstract class GrapheneType<T extends GraphQLOutputType|GraphQLInputType = GraphQLOutputType>
 {
     kind: Kind;
     name: string;
@@ -197,7 +238,7 @@ export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputTy
     }
 
     static _instances = {} as Record<string, GrapheneType<any>>;
-    static async create(type: GraphQLOutputType): Promise<GrapheneType|undefined>
+    static async create(type: GraphQLOutputType|GraphQLInputType): Promise<GrapheneType|undefined>
     {
         await (new Promise(res => setTimeout(res, 0)));
 
@@ -233,6 +274,7 @@ export abstract class GrapheneType<T extends GraphQLOutputType = GraphQLOutputTy
     isScalar =  (): this is GrapheneScalarType  => this.kind === "SCALAR";
     isNonNull = (): this is GrapheneNonNullType => this.kind === "NONNULL";
     isUnion =   (): this is GrapheneUnionType   => this.kind === "UNION";
+    isInputObject =   (): this is GrapheneInputObjectType   => this.kind === "INPUT_OBJECT";
     isEnum =    (): this is GrapheneEnumType        => this.kind === "ENUM";
     isUnknown = (): this is GrapheneType        => this.kind === "UNKNOWN";
 
@@ -421,7 +463,7 @@ export class GrapheneInputObjectType extends GrapheneType
     fields: GrapheneField<GrapheneInputObjectType>[] = [];
     fieldMap: Record<string, GrapheneField<GrapheneInputObjectType>>;
     
-    static async create(type: GraphQLOutputType)
+    static async create(type: GraphQLInputType)
     {
         const o = new GrapheneInputObjectType(type as any);
         o.fields = await GrapheneField.fromFieldMap(type["getFields"]() as any);
@@ -429,9 +471,24 @@ export class GrapheneInputObjectType extends GrapheneType
         return o;
     } 
 
-    toQuery(_c = maxScopes)
+    toQuery()
     {
         return "";
+    }
+
+    toArgument(data: any)
+    {
+
+        const values = Object.entries(data)
+            .filter(([k]) => this.fieldMap[k] !== undefined)
+            .map(([k, v]) => {
+                const field = this.fieldMap[k];
+                console.log("lol field", field, field.isEnum());
+                let isString = !field.type.getType(GrapheneEnumType) && typeof field !== "number";
+                return `${k}: ${isString ? `"${v}"` : v}`;
+            });
+
+        return `{ ${values.join(", ")} }`
     }
 
     renderCell(_val: any)
@@ -475,9 +532,30 @@ export class GrapheneEnumType extends GrapheneType<GraphQLEnumType>
 // #endregion
 
 
-export type GrapheneArgument<
+export class GrapheneArgument<
     T extends GrapheneType<GraphQLOutputType> = GrapheneType<GraphQLOutputType>
-> = GraphQLArgument & { type:  T };
+>
+{
+    name: string;
+    type: T;
+    description: string;
+    defaultValue: any;
+
+    private constructor(public _arg: GraphQLArgument)
+    {
+        this.name = _arg.name;
+        this.description = _arg.description;
+        this.defaultValue = _arg.defaultValue;
+    }
+
+    static async create(arg: GraphQLArgument)
+    {
+        const result = new GrapheneArgument(arg);
+        result.type = await GrapheneType.create(arg.type);
+        return result;
+    }
+
+}
 
 export const kindMap = {
     LIST: GrapheneListType,
@@ -490,7 +568,7 @@ export const kindMap = {
     UNKNOWN: GrapheneType
 }
 
-function getKind(type: GraphQLOutputType): Kind
+function getKind(type: GraphQLOutputType|GraphQLInputType): Kind
 {
     if (type instanceof GraphQLList) return "LIST";
     if (type instanceof GraphQLObjectType) return "OBJECT";

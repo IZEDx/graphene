@@ -31,7 +31,13 @@ export class GrapheneNav
                     },
                     {
                         name: "Account",
-                        url: "/user/",
+                        url: "/user/1",
+                        children: [],
+                        exact: true
+                    },
+                    {
+                        name: "Logout",
+                        url: "/logout",
                         children: [],
                         exact: true
                     }

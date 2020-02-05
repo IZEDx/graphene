@@ -1,4 +1,4 @@
-import { Component, h, Prop, Event, EventEmitter, Watch, State } from "@stencil/core";
+import { Component, h, Prop, Event, EventEmitter, Watch, State, Listen } from "@stencil/core";
 import { MatchResults } from "@stencil/router";
 import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
@@ -87,6 +87,21 @@ export class EditView
         
     }
 
+    @Listen("inputUpdate")
+    onInputUpdate(e: CustomEvent<{formKey: string, value: string}>)
+    {
+        const entry = this.entries.find(([k]) => k === e.detail.formKey);
+        entry[1] = e.detail.value;
+        this.entries = this.entries;
+        console.log("Form Update", this.entries);
+    }
+
+    async onSave()
+    {
+        const result = await this.definition.edit(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
+        console.log(result);
+    }
+
     render() 
     {
 
@@ -116,7 +131,7 @@ export class EditView
                                 </div>
                                 <div class="level-right">
                                     <div class="level-item">
-                                        <button class="button is-primary">Save</button>
+                                        <button class="button is-primary" onClick={() => this.onSave()}>Save</button>
                                     </div>
                                 </div>
                             </div>,

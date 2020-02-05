@@ -97,6 +97,8 @@ export class GrapheneUI
                                 this.isExpanded = false;
                             }}>
                                 <stencil-route-switch scrollTopOffset={0}>
+                                    <stencil-route url="/login" component="view-login" routeRender={routeListener} />
+                                    <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
                                     <stencil-route url="/:name/:id" component="view-edit" routeRender={routeListener} />
                                     <stencil-route url="/:name" component="view-list" routeRender={routeListener} />
                                     <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />

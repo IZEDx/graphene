@@ -3,7 +3,7 @@ import { RouterHistory, injectHistory } from "@stencil/router";
 
 @Component({
     tag: 'gel-table',
-    //styleUrl: 'view-list.scss',
+    styleUrl: 'style.scss',
 })
 export class GELTable 
 {
@@ -15,7 +15,7 @@ export class GELTable
     render()
     {
 
-        return <table class="table">
+        return <table class="table is-striped is-hoverable is-fullwidth">
             <thead>
                 <tr>
                     { this.columns?.map(col => (

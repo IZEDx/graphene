@@ -8,9 +8,9 @@ export class GELForm
 {
 
     @Listen("inputUpdate")
-    onInputUpdate(e: CustomEvent<{formKey: string, value: string}>)
+    onInputUpdate(_e: CustomEvent<{formKey: string, value: string}>)
     {
-        console.log("Form Update", e.detail);
+        //console.log("Form Update", e.detail);
     }
     
     render()

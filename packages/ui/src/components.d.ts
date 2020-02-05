@@ -86,6 +86,7 @@ export namespace Components {
     'columnCount': number;
     'match': MatchResults;
   }
+  interface ViewLogin {}
 }
 
 declare global {
@@ -168,6 +169,12 @@ declare global {
     prototype: HTMLViewListElement;
     new (): HTMLViewListElement;
   };
+
+  interface HTMLViewLoginElement extends Components.ViewLogin, HTMLStencilElement {}
+  var HTMLViewLoginElement: {
+    prototype: HTMLViewLoginElement;
+    new (): HTMLViewLoginElement;
+  };
   interface HTMLElementTagNameMap {
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
     'gel-form': HTMLGelFormElement;
@@ -182,6 +189,7 @@ declare global {
     'view-dashboard': HTMLViewDashboardElement;
     'view-edit': HTMLViewEditElement;
     'view-list': HTMLViewListElement;
+    'view-login': HTMLViewLoginElement;
   }
 }
 
@@ -261,6 +269,9 @@ declare namespace LocalJSX {
     'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
+  interface ViewLogin {
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
+  }
 
   interface IntrinsicElements {
     'gel-breadcrumbs': GelBreadcrumbs;
@@ -276,6 +287,7 @@ declare namespace LocalJSX {
     'view-dashboard': ViewDashboard;
     'view-edit': ViewEdit;
     'view-list': ViewList;
+    'view-login': ViewLogin;
   }
 }
 
@@ -298,6 +310,7 @@ declare module "@stencil/core" {
       'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
       'view-edit': LocalJSX.ViewEdit & JSXBase.HTMLAttributes<HTMLViewEditElement>;
       'view-list': LocalJSX.ViewList & JSXBase.HTMLAttributes<HTMLViewListElement>;
+      'view-login': LocalJSX.ViewLogin & JSXBase.HTMLAttributes<HTMLViewLoginElement>;
     }
   }
 }
