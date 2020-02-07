@@ -25,6 +25,17 @@ import {
 } from './components/elements/menu/model';
 
 export namespace Components {
+  interface ContentCreate {}
+  interface ContentEdit {
+    'params': Record<string, string|number>|undefined;
+    'preferredColumns': string[];
+    'readonlyColumns': string[];
+  }
+  interface ContentList {
+    'columnCount': number;
+    'preferredColumns': string[];
+    'preferredEndColumns': string[];
+  }
   interface GelBreadcrumbs {
     'anchorClass': ClassList;
     'breadcrumbClass': ClassList;
@@ -47,6 +58,7 @@ export namespace Components {
     'value'?: boolean;
   }
   interface GelInputText {
+    'autoComplete': string;
     'disabled'?: boolean;
     'formKey': string;
     'inputClass': string|Record<string, boolean>;
@@ -75,27 +87,39 @@ export namespace Components {
   interface GrapheneNav {}
   interface GrapheneUi {
     'endPoint': string;
-    'token': string;
+    'token'?: string;
   }
   interface UtilRouteListener {
     'props': RouteRenderProps | undefined;
   }
-  interface ViewCreate {
+  interface ViewContent {
     'match': MatchResults;
   }
   interface ViewDashboard {}
-  interface ViewEdit {
-    'match': MatchResults;
-  }
-  interface ViewList {
-    'columnCount': number;
-    'match': MatchResults;
-  }
   interface ViewLogin {}
+  interface ViewLogout {}
 }
 
 declare global {
 
+
+  interface HTMLContentCreateElement extends Components.ContentCreate, HTMLStencilElement {}
+  var HTMLContentCreateElement: {
+    prototype: HTMLContentCreateElement;
+    new (): HTMLContentCreateElement;
+  };
+
+  interface HTMLContentEditElement extends Components.ContentEdit, HTMLStencilElement {}
+  var HTMLContentEditElement: {
+    prototype: HTMLContentEditElement;
+    new (): HTMLContentEditElement;
+  };
+
+  interface HTMLContentListElement extends Components.ContentList, HTMLStencilElement {}
+  var HTMLContentListElement: {
+    prototype: HTMLContentListElement;
+    new (): HTMLContentListElement;
+  };
 
   interface HTMLGelBreadcrumbsElement extends Components.GelBreadcrumbs, HTMLStencilElement {}
   var HTMLGelBreadcrumbsElement: {
@@ -157,10 +181,10 @@ declare global {
     new (): HTMLUtilRouteListenerElement;
   };
 
-  interface HTMLViewCreateElement extends Components.ViewCreate, HTMLStencilElement {}
-  var HTMLViewCreateElement: {
-    prototype: HTMLViewCreateElement;
-    new (): HTMLViewCreateElement;
+  interface HTMLViewContentElement extends Components.ViewContent, HTMLStencilElement {}
+  var HTMLViewContentElement: {
+    prototype: HTMLViewContentElement;
+    new (): HTMLViewContentElement;
   };
 
   interface HTMLViewDashboardElement extends Components.ViewDashboard, HTMLStencilElement {}
@@ -169,24 +193,21 @@ declare global {
     new (): HTMLViewDashboardElement;
   };
 
-  interface HTMLViewEditElement extends Components.ViewEdit, HTMLStencilElement {}
-  var HTMLViewEditElement: {
-    prototype: HTMLViewEditElement;
-    new (): HTMLViewEditElement;
-  };
-
-  interface HTMLViewListElement extends Components.ViewList, HTMLStencilElement {}
-  var HTMLViewListElement: {
-    prototype: HTMLViewListElement;
-    new (): HTMLViewListElement;
-  };
-
   interface HTMLViewLoginElement extends Components.ViewLogin, HTMLStencilElement {}
   var HTMLViewLoginElement: {
     prototype: HTMLViewLoginElement;
     new (): HTMLViewLoginElement;
   };
+
+  interface HTMLViewLogoutElement extends Components.ViewLogout, HTMLStencilElement {}
+  var HTMLViewLogoutElement: {
+    prototype: HTMLViewLogoutElement;
+    new (): HTMLViewLogoutElement;
+  };
   interface HTMLElementTagNameMap {
+    'content-create': HTMLContentCreateElement;
+    'content-edit': HTMLContentEditElement;
+    'content-list': HTMLContentListElement;
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
     'gel-form': HTMLGelFormElement;
     'gel-input-select': HTMLGelInputSelectElement;
@@ -197,15 +218,25 @@ declare global {
     'graphene-nav': HTMLGrapheneNavElement;
     'graphene-ui': HTMLGrapheneUiElement;
     'util-route-listener': HTMLUtilRouteListenerElement;
-    'view-create': HTMLViewCreateElement;
+    'view-content': HTMLViewContentElement;
     'view-dashboard': HTMLViewDashboardElement;
-    'view-edit': HTMLViewEditElement;
-    'view-list': HTMLViewListElement;
     'view-login': HTMLViewLoginElement;
+    'view-logout': HTMLViewLogoutElement;
   }
 }
 
 declare namespace LocalJSX {
+  interface ContentCreate {}
+  interface ContentEdit {
+    'params'?: Record<string, string|number>|undefined;
+    'preferredColumns'?: string[];
+    'readonlyColumns'?: string[];
+  }
+  interface ContentList {
+    'columnCount'?: number;
+    'preferredColumns'?: string[];
+    'preferredEndColumns'?: string[];
+  }
   interface GelBreadcrumbs {
     'anchorClass'?: ClassList;
     'breadcrumbClass'?: ClassList;
@@ -230,6 +261,7 @@ declare namespace LocalJSX {
     'value'?: boolean;
   }
   interface GelInputText {
+    'autoComplete'?: string;
     'disabled'?: boolean;
     'formKey'?: string;
     'inputClass'?: string|Record<string, boolean>;
@@ -269,7 +301,7 @@ declare namespace LocalJSX {
     'onPageWillUpdate'?: (event: CustomEvent<LocationSegments>) => void;
     'props'?: RouteRenderProps | undefined;
   }
-  interface ViewCreate {
+  interface ViewContent {
     'match'?: MatchResults;
     'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
@@ -277,22 +309,17 @@ declare namespace LocalJSX {
   interface ViewDashboard {
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
-  interface ViewEdit {
-    'match'?: MatchResults;
-    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
-    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
-  }
-  interface ViewList {
-    'columnCount'?: number;
-    'match'?: MatchResults;
-    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
-    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
-  }
   interface ViewLogin {
+    'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
+  }
+  interface ViewLogout {
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
 
   interface IntrinsicElements {
+    'content-create': ContentCreate;
+    'content-edit': ContentEdit;
+    'content-list': ContentList;
     'gel-breadcrumbs': GelBreadcrumbs;
     'gel-form': GelForm;
     'gel-input-select': GelInputSelect;
@@ -303,11 +330,10 @@ declare namespace LocalJSX {
     'graphene-nav': GrapheneNav;
     'graphene-ui': GrapheneUi;
     'util-route-listener': UtilRouteListener;
-    'view-create': ViewCreate;
+    'view-content': ViewContent;
     'view-dashboard': ViewDashboard;
-    'view-edit': ViewEdit;
-    'view-list': ViewList;
     'view-login': ViewLogin;
+    'view-logout': ViewLogout;
   }
 }
 
@@ -317,6 +343,9 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'content-create': LocalJSX.ContentCreate & JSXBase.HTMLAttributes<HTMLContentCreateElement>;
+      'content-edit': LocalJSX.ContentEdit & JSXBase.HTMLAttributes<HTMLContentEditElement>;
+      'content-list': LocalJSX.ContentList & JSXBase.HTMLAttributes<HTMLContentListElement>;
       'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;
       'gel-form': LocalJSX.GelForm & JSXBase.HTMLAttributes<HTMLGelFormElement>;
       'gel-input-select': LocalJSX.GelInputSelect & JSXBase.HTMLAttributes<HTMLGelInputSelectElement>;
@@ -327,11 +356,10 @@ declare module "@stencil/core" {
       'graphene-nav': LocalJSX.GrapheneNav & JSXBase.HTMLAttributes<HTMLGrapheneNavElement>;
       'graphene-ui': LocalJSX.GrapheneUi & JSXBase.HTMLAttributes<HTMLGrapheneUiElement>;
       'util-route-listener': LocalJSX.UtilRouteListener & JSXBase.HTMLAttributes<HTMLUtilRouteListenerElement>;
-      'view-create': LocalJSX.ViewCreate & JSXBase.HTMLAttributes<HTMLViewCreateElement>;
+      'view-content': LocalJSX.ViewContent & JSXBase.HTMLAttributes<HTMLViewContentElement>;
       'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
-      'view-edit': LocalJSX.ViewEdit & JSXBase.HTMLAttributes<HTMLViewEditElement>;
-      'view-list': LocalJSX.ViewList & JSXBase.HTMLAttributes<HTMLViewListElement>;
       'view-login': LocalJSX.ViewLogin & JSXBase.HTMLAttributes<HTMLViewLoginElement>;
+      'view-logout': LocalJSX.ViewLogout & JSXBase.HTMLAttributes<HTMLViewLogoutElement>;
     }
   }
 }

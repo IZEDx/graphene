@@ -13,6 +13,10 @@ import { readFile } from 'fs';
 import jwt from "express-jwt";
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { UserRole } from './models/enums/UserRole';
+import cookieParser from "cookie-parser";
+import { Container } from "typedi";
+import { UserService } from './services/UserService';
+import { ColorfulChalkLogger, DEBUG } from "colorful-chalk-logger";
 
 const www = join(__dirname, "..", "..", "ui", "www");
 const indexHtml = join(www, "index.html");
@@ -37,96 +41,129 @@ export interface GrapheneOptions
 
 export class GrapheneServer
 {
+    public logger: ColorfulChalkLogger;
+    public options: GrapheneOptions;
+    public schema: GraphQLSchema;
+    public apollo: ApolloServer;
+    public express: Express;
+    public orm: Connection;
 
-    private constructor(
-        public options: GrapheneOptions,
-        public schema: GraphQLSchema,
-        public apollo: ApolloServer, 
-        public express: Express,
-        public orm: Connection
-    ){}
+    private constructor(){}
 
     static async create(opts?: GrapheneOptions)
     {
+        const server = new GrapheneServer();
+        server.options = opts ?? {};
 
-        const connection = await createConnection(Object.assign({
+        Container.set("server", server);
+        
+        server.logger = new ColorfulChalkLogger('graphene', {
+            level: DEBUG,   // the default value is INFO
+            date: false,    // the default value is false.
+            colorful: true, // the default value is true.
+            inline: true
+        }, process.argv);
+
+        Container.set("logger", server.logger);
+
+        const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
             entities: [User, ...(opts?.entities ?? [])],
             synchronize: true
-        }, opts?.connection));
+        }, opts?.connection);
 
-        const schema = await buildSchema({
-            resolvers: [UserResolver, ...(opts?.resolvers ?? [])],
-            emitSchemaFile: true,
-            authChecker: GrapheneServer.authChecker
-        });
+        server.logger.verbose(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
+        server.orm = await createConnection(connectionConfig);
 
-        const apollo = new ApolloServer({
-            schema,
-            validationRules: [depthLimit(7)],
-            context: ({ req }) => ({
-                req,
-                user: (req as any).user ?? {}, // `req.user` comes from `express-jwt`
-              } as GrapheneContext),
-        });
 
-        const app = express();
+        server.logger.verbose("Setting up express");
+        server.express = express();
+        
+        server.express.use('*', cors()); 
+        server.express.use(compression());
+        server.express.use(cookieParser());
 
-        app.use('*', cors()); 
-        app.use(compression());
-        app.use("/api", jwt({ 
-          secret: opts?.secret ?? "Graphene",
-          credentialsRequired: false,
+        server.logger.verbose("Setting up jwt");
+        server.express.use(jwt({ 
+            secret: opts?.secret ?? "Graphene",
+            credentialsRequired: false,
+            getToken: (req) => {
+                if (req.headers.authorization?.split(' ')[0] === 'Bearer') {
+                    return req.headers.authorization.split(' ')[1];
+                } else if (req.query?.token) {
+                    return req.query.token;
+                } else if (req.cookies?.token) {
+                    return req.cookies.token;
+                }
+                return null;
+            }
         }));
-        apollo.applyMiddleware({ app, path: '/graphql' });
-        app.use(express.static(www));
-        app.use((req, res) => {
+
+        
+
+        server.logger.verbose("Setting up api");
+        server.schema = await buildSchema({
+            resolvers: [UserResolver, ...(opts?.resolvers ?? [])],
+            emitSchemaFile: false,
+            authChecker: UserService.AuthChecker,
+            container: Container
+        });
+
+        server.apollo = new ApolloServer({
+            schema: server.schema,
+            validationRules: [depthLimit(7)],
+            context: ({req, res}) => {
+                const user = (req as any).user ?? {};
+                server.logger.debug("context user", user);
+                return { req, res, user } as GrapheneContext;
+            },
+        });
+        server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
+
+        server.logger.verbose("Setting up ui");
+        server.express.use(express.static(www));
+        server.express.use((req, res) => {
             readFile(indexHtml, (err, data) => {
                 res.send(data.toString());
             });
         });
 
+        server.logger.verbose("Checking for admin user");
         await this.createAdminUser(opts?.adminPassword);
-        
-        return new GrapheneServer(opts ?? {}, schema, apollo, app, connection);
+
+        return server;
     }
 
 
     private static async createAdminUser(overridePw?: string)
     {
+        const userService = Container.get(UserService);
         let adminUser = await User.findOne({where: {name: "admin"}});
         if (!adminUser)
         {
-            adminUser = User.create({name: "admin", role: UserRole.ADMIN, password: "admin"})
+            adminUser = await userService.create({name: "admin", role: UserRole.ADMIN, password: "admin"});
         }
         
         if (overridePw)
         {
-            adminUser.password = overridePw;
+            userService.update(adminUser, {
+                password: overridePw
+            });
         }
-
-        return adminUser.save();
     }
 
-    private static authChecker: AuthChecker<GrapheneContext> = 
-    async ({ root, args, context, info }, roles) => 
-    {
-        const user = await User.findOne(context.user.id);
-        if (user) {
-            return roles.length === 0 || roles.includes(user.role);
-        }
-        return false; 
-    }
 
     async listen()
     {
+        const host = this.options.hostname ?? "0.0.0.0";
+        const port = this.options.port ?? 1234;
+
         return new Promise((res) => 
-            this.express.listen(
-                this.options.port ?? 1234, 
-                this.options.hostname ?? "0.0.0.0", 
-                res
-            )
+            this.express.listen(port, host, () => {
+                    this.logger.info(`Listening on ${host}:${port}`);
+                    res();
+            })
         );
     }
 }

@@ -1,6 +1,7 @@
 import { Entity, BaseEntity, PrimaryGeneratedColumn, Column } from "typeorm";
-import { Field, Int, ObjectType, ID,  } from "type-graphql";
+import { Field, ObjectType, ID,  } from "type-graphql";
 import { UserRole } from "./enums/UserRole";
+import { Password } from "./scalars/Password";
 
 @ObjectType()
 @Entity()
@@ -15,7 +16,7 @@ export default class User extends BaseEntity
     name: string;
 
     @Column()
-    @Field()
+    @Field(type => Password)
     password: string;
 
     @Column("varchar")

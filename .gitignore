@@ -3,3 +3,4 @@ dist/
 .cache/
 *.sqlite3
 /schema.gql
+yarn-error.log

@@ -1,13 +1,20 @@
-import { Arg, FieldResolver, Query, Resolver, Root, Mutation, Authorized, ResolverInterface } from "type-graphql";
+import { Arg, Query, Resolver, Mutation, Authorized, Ctx } from "type-graphql";
 import User from "../models/User";
 import { CreateUserInput } from "../inputs/CreateUserInput";
 import { EditUserInput } from "../inputs/EditUserInput";
 import { LoginUserInput } from "../inputs/LoginUserInput";
 import { GrapheneContext } from "../server";
+import { Service } from "typedi";
+import { UserService } from "../services/UserService";
 
+@Service()
 @Resolver(of => User)
-export default class UserResolver implements ResolverInterface<User>
+export default class UserResolver //implements ResolverInterface<User>
 {
+    constructor(
+        private readonly userService: UserService
+    ){}
+
     @Authorized("USER", "ADMIN")
     @Query(returns => [User])
     users()
@@ -21,19 +28,12 @@ export default class UserResolver implements ResolverInterface<User>
     {
         return User.findOne({ where: { id } });
     }
-    
-    @FieldResolver()
-    password(@Root() userData: User) 
-    {
-        return "***";
-    }
 
     @Authorized("ADMIN")
     @Mutation(() => User)
     async createUser(@Arg("data") data: CreateUserInput) 
     {
-        const user = User.create(data);
-        return user.save();
+        return this.userService.create(data);
     }
 
     @Authorized("ADMIN")
@@ -42,10 +42,8 @@ export default class UserResolver implements ResolverInterface<User>
     {
         const user = await User.findOne({ where: { id: data.id } });
         if (!user) throw new Error("User not found: " + data.id);
-        data.id = user.id;
-        if (data.password === "***") data.password = user.password;
-        Object.assign(user, data);
-        return user.save();
+
+        return this.userService.update(user, data);
     }
 
     @Authorized("ADMIN")
@@ -60,43 +58,38 @@ export default class UserResolver implements ResolverInterface<User>
 
     @Authorized("USER", "ADMIN")
     @Query(() => User)
-    async me(@Root("context") context: GrapheneContext)
+    async me(@Ctx() context: GrapheneContext)
     {
-        const user = User.findOne({ where: { id: context.user.id } });
+        const user = await User.findOne({ where: { id: context.user.id } });
         if (!user) throw new Error("User not found: " + context.user.id);
-        return user;
+
+        return user; 
     }
 
     @Authorized("USER", "ADMIN")
     @Mutation(() => User)
-    async editMe(@Arg("data") data: EditUserInput, @Root("context") context: GrapheneContext) 
+    async editMe(@Arg("data") data: EditUserInput, @Ctx() context: GrapheneContext) 
     {
         const user = await User.findOne({ where: { id: context.user.id } });
 
-        data.id = user!.id;
-        if (data.password === "***") data.password = user!.password;
-        Object.assign(user, data);
-        return user!.save();
+        return this.userService.update(user!, data);
     }
 
-    @Mutation(() => User)
-    async login(@Arg("data") data: LoginUserInput, @Root("context") context: GrapheneContext)
+    @Mutation(() => String)
+    async login(@Arg("data") data: LoginUserInput, @Ctx() context: GrapheneContext)
     {
         const user = await User.findOne({ where: { name: data.name } });
-        if (!user || user.password !== data.password)
-        {
-            throw new Error("Credentials invalid");
-        }
-        context.user.id = user.id;
-        return user;
+        if (!user || !await this.userService.checkPassword(user, data.password)) throw new Error("Credentials invalid");
+
+        return this.userService.authorize(user, context, 1);
     }
 
     @Authorized("USER", "ADMIN")
-    @Mutation(() => User)
-    async logout(@Root("context") context: GrapheneContext)
+    @Mutation(type => String)
+    async logout(@Ctx() context: GrapheneContext)
     {
-        const user = await User.findOne({ where: { id: context.user.id } });
-        context.user.id = undefined;
-        return user!;
+        context.res.clearCookie('token');
+        context.user = {};
+        return "";
     }
 } 

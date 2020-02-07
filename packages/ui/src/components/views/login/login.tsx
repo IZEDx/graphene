@@ -1,4 +1,4 @@
-import { Component, h, Event, EventEmitter } from "@stencil/core";
+import { Component, h, Event, EventEmitter, Listen } from "@stencil/core";
 import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 
@@ -12,15 +12,40 @@ export class LoginView
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
 
     @graphene.Context("api") api: GrapheneAPI;
+    form = {
+        name: "",
+        password: ""
+    }
 
     componentWillLoad()
     {
         this.pushBreadcrumb.emit(["Login", "/login"]);
     }
 
-    onLogin()
+    async onLogin()
     {
-        console.log("login");
+        const loginQuery = `
+            mutation {
+                login(data: {
+                    name: "${this.form.name}",
+                    password: "${this.form.password}"
+                })
+            }
+        `;
+
+        const result = await this.api.client.request(loginQuery);
+        const token = result?.login;
+        if (token)
+        {
+            localStorage.setItem("token", token);
+            this.api.setToken(localStorage.getItem("token"));
+        }
+    }
+
+    @Listen("inputUpdate")
+    onInputUpdate(_e: CustomEvent<{formKey: string, value: string}>)
+    {
+        this.form[_e.detail.formKey] = _e.detail.value;
     }
 
     render()
@@ -40,11 +65,13 @@ export class LoginView
                                     <gel-input-text 
                                         formKey="name"
                                         label="username"
+                                        autoComplete="on"
                                     ></gel-input-text>
                                     <gel-input-text 
                                         formKey="password"
                                         label="password"
                                         type="password"
+                                        autoComplete="on"
                                     ></gel-input-text>
                                 </gel-form>
                             </div>

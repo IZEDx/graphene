@@ -30,18 +30,23 @@ export class GrapheneNav
                         exact: true
                     },
                     {
-                        name: "My Account",
-                        url: "/users/1",
-                        children: [],
-                        exact: true
-                    },
-                    {
                         name: "Logout",
                         url: "/logout",
                         children: [],
                         exact: true
                     }
                 ]
+            },
+            {
+                name: "Single",
+                items: this.graphene.queryObjects
+                .filter(f => f.args.length === 0)                
+                .map(({name}) => ({
+                    name: pascalCase(name), 
+                    url: `/${name}`, 
+                    children: [], 
+                    exact: false
+                }))
             },
             {
                 name: "Content",

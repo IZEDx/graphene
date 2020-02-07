@@ -16,6 +16,7 @@ export class GELInputText
     @Prop() placeholder?: string;
     @Prop() inputClass: string|Record<string, boolean> = "";
     @Prop() type = "text"
+    @Prop() autoComplete = "off";
 
     inputEl: HTMLInputElement;
 
@@ -48,6 +49,7 @@ export class GELInputText
                                 value={this.value} 
                                 onKeyUp={e => this.updateContent(e)}
                                 disabled={this.disabled}
+                                autoComplete={this.autoComplete}
                             />
                         </p>
                     </div>

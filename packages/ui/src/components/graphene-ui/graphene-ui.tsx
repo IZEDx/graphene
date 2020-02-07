@@ -15,23 +15,36 @@ import { Graphene } from '../../libs/graphene';
 export class GrapheneUI 
 {
     @Prop() endPoint: string;
-    @Prop() token: string;
+    @Prop() token?: string;
 
     @State() breadcrumb: Breadcrumbs = [["Dashboard", "/"]];
 
     @graphene.Provide("api") api: GrapheneAPI;
     @graphene.Provide("graphene") graphene: Graphene;
     @graphene.Provide("connected") isConnected = false;
+    @graphene.Provide("authorized") isAuthorized = false;
 
     @nav.Provide("isExpanded") isExpanded = false;
 
     async componentWillLoad()
     {
-        this.api = new API(this.endPoint, undefined/*this.token*/, APIQueries);
+        this.api = new API(this.endPoint, APIQueries, this.token ?? localStorage.getItem("token"));
         this.graphene = new Graphene(this.api);
         this.breadcrumb = [[this.endPoint, "/"]];
 
         await this.graphene.load();
+
+        try
+        {
+            const meField = this.graphene.getQuery("me");
+            const me = (await meField?.request())[meField?.name];
+            if (me) this.isAuthorized = true;
+            else this.isAuthorized = false;
+        } catch(err)
+        {
+            this.isAuthorized = false;
+        }
+
         this.isConnected = true;
         console.log(this.graphene);
     }
@@ -55,7 +68,6 @@ export class GrapheneUI
     onClearBreadcrumb()
     {
         this.breadcrumb = [this.breadcrumb[0]];
-        console.log(this.breadcrumb);
     }
 
     @Listen("pageLeave")
@@ -76,7 +88,10 @@ export class GrapheneUI
         return (
             <Host>
                 <div class="dashboard is-full-height">
-                    <graphene-nav></graphene-nav>
+                    { !this.isAuthorized ? ""
+                        : <graphene-nav></graphene-nav>
+                    }
+                    
 
                     <div class="dashboard-main">
                         <nav class="navbar">
@@ -92,19 +107,22 @@ export class GrapheneUI
                             </div>
                         </nav>
 
-                        <div class="body is-fullheight">
-                            <stencil-router onClick={() => {
-                                this.isExpanded = false;
-                            }}>
-                                <stencil-route-switch scrollTopOffset={0}>
-                                    <stencil-route url="/login" component="view-login" routeRender={routeListener} />
-                                    <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
-                                    <stencil-route url="/:name/new" component="view-create" routeRender={routeListener} />
-                                    <stencil-route url="/:name/:id" component="view-edit" routeRender={routeListener} />
-                                    <stencil-route url="/:name" component="view-list" routeRender={routeListener} />
-                                    <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
-                                </stencil-route-switch>
-                            </stencil-router>
+                        <div class="body is-fullheight" onClick={() => {
+                            this.isExpanded = false;
+                        }}>
+                            { !this.isAuthorized
+                            ? <view-login></view-login>
+                            : (
+                                <stencil-router >
+                                    <stencil-route-switch scrollTopOffset={0}>
+                                        <stencil-route url="/login" component="view-login" routeRender={routeListener} />
+                                        <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
+                                        <stencil-route url="/:name/:id" component="view-content" routeRender={routeListener} />
+                                        <stencil-route url="/:name" component="view-content" routeRender={routeListener} />
+                                        <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
+                                    </stencil-route-switch>
+                                </stencil-router>
+                            )}
                         </div>
 
                         {/*

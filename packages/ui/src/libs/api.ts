@@ -5,13 +5,19 @@ export class API<Responses extends Record<string, any>, Queries extends Record<k
 {
     public client: GraphQLClient;
 
-    constructor(public url: string, token: string, public queries: Queries) {
-        this.client = new GraphQLClient(url, {
-            headers: !token ? {} : {
-                Authorization: `Bearer ${token}`,
-            },
-        })
+    constructor(public url: string, public queries: Queries, token?: string) 
+    {
+        this.setToken(token);
+    }
 
+    setToken(token?: string)
+    {
+        const headers  = !token || token === "undefined" ? {} : {
+            Authorization: `Bearer ${token}`,
+        };
+
+        console.log(typeof token, headers);
+        this.client = new GraphQLClient(this.url, {headers})
     }
 
     query<K extends keyof (Queries|Responses)>(query: K, variables?: Variables)

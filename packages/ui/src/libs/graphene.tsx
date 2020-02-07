@@ -69,12 +69,12 @@ export class Graphene
 
     get queryLists(): GrapheneQueryField<GrapheneListType>[]
     {
-        return this.queryFields.filter(({type}) => type.isList() || type.isNonNull() && type.ofType.isList()) as any; 
+        return this.queryFields.filter(({type}) => type.getType(GrapheneListType)) as any; 
     }
 
     get queryObjects(): GrapheneQueryField<GrapheneObjectType>[]
     {
-        return this.queryFields.filter(f => f.isObject()) as any; 
+        return this.queryFields.filter(({type}) => type.getType(GrapheneObjectType)) as any; 
     }
 
 }
@@ -170,18 +170,19 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         return result as any;
     }
 
-    async request<T = any>(args?: Record<string, string|number>, mutation = false)
+    async request<T = any>(args?: Record<string, string|number>)
     {
-        const fields = this.type.isObject() && this.type.fieldMap;
-        const argStr = args ? `(${Object.entries(args).map(([k, v]) => 
+        const fields = this.type.getType(GrapheneObjectType)?.fieldMap;
+        const argStr = args && fields && Object.entries(args).length > 0 ? `(${Object.entries(args).map(([k, v]) => 
         {
             const field = fields[k];
+            console.log(k, field, fields);
 
             const quoted = typeof v === "string" || field.name === "String"
             return  `${k}: ` + (quoted ? `"${v}"` : v);
         }).join(", ")})` : "";
         
-        const query = `${mutation ? "mutation " : ""}{
+        const query = `{
             ${this.name}${argStr} ${this.type.toQuery()}
         }`;
         
@@ -237,6 +238,8 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         console.log(query);
         return this.graphene.api.client.request<T>(query);
     }
+
+    //TODO: Delete
 }
 
 // #endregion
@@ -297,6 +300,7 @@ export abstract class GrapheneType<T extends GraphQLOutputType|GraphQLInputType 
 
     getType<R extends GrapheneType>(type: Function&{create(...args: any[]): Promise<R>}, c = 5): R|undefined
     {
+        console.log("getType", this, type);
         if (c < 0) return undefined;
         if (this instanceof type) return this as any;
         if (this.isNonNull()) return this.ofType?.getType(type, c - 1);
@@ -404,6 +408,7 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
             case "DateTime": return <gel-input-text {...props} key={props.key}></gel-input-text>;
             case "Boolean": return <gel-input-switch {...props} key={props.key}></gel-input-switch>;
             case "ID": return <gel-input-text {...props} key={props.key}></gel-input-text>;
+            case "Password": return <gel-input-text {...props} key={props.key} type="password" autoComplete="new-password"></gel-input-text>;
             case "String": return <gel-input-text {...props} key={props.key}></gel-input-text>;
             default: return <gel-input-text {...props} key={props.key}></gel-input-text>;
         }
