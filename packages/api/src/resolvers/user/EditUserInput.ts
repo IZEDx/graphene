@@ -1,8 +1,11 @@
 import { InputType, Field } from "type-graphql";
-import { UserRole } from "../models/enums/UserRole";
+import { UserRole } from "../../models/enums/UserRole";
 
 @InputType()
-export class CreateUserInput {
+export class EditUserInput {
+    @Field()
+    id: string;
+
     @Field()
     name: string;
 

@@ -1,11 +1,11 @@
 import { Arg, Query, Resolver, Mutation, Authorized, Ctx } from "type-graphql";
-import User from "../models/User";
-import { CreateUserInput } from "../inputs/CreateUserInput";
-import { EditUserInput } from "../inputs/EditUserInput";
-import { LoginUserInput } from "../inputs/LoginUserInput";
-import { GrapheneContext } from "../server";
+import User from "../../models/User";
+import { CreateUserInput } from "./CreateUserInput";
+import { EditUserInput } from "./EditUserInput";
+import { LoginUserInput } from "./LoginUserInput";
+import { GrapheneContext } from "../../server";
 import { Service } from "typedi";
-import { UserService } from "../services/UserService";
+import { UserService } from "../../services/UserService";
 
 @Service()
 @Resolver(of => User)

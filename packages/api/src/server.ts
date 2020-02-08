@@ -5,8 +5,8 @@ import compression from 'compression';
 import cors from 'cors';
 import { buildSchema, AuthChecker } from 'type-graphql';
 import { GraphQLSchema } from 'graphql';
-import UserResolver from './resolvers/UserResolver';
-import { createConnection, Connection, EntitySchema, ConnectionOptions } from 'typeorm';
+import UserResolver from './resolvers/user/UserResolver';
+import { createConnection, Connection, EntitySchema, ConnectionOptions, useContainer } from 'typeorm';
 import { join } from "path";
 import User from './models/User';
 import { readFile } from 'fs';
@@ -17,9 +17,13 @@ import cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { UserService } from './services/UserService';
 import { ColorfulChalkLogger, DEBUG } from "colorful-chalk-logger";
+import DemoPage from './models/DemoPage';
+import DemoPageResolver from './resolvers/demoPage/DemoPageResolver';
 
 const www = join(__dirname, "..", "..", "ui", "www");
 const indexHtml = join(www, "index.html");
+
+useContainer(Container);
 
 export interface GrapheneContext extends ExpressContext
 {
@@ -69,7 +73,7 @@ export class GrapheneServer
         const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [User, ...(opts?.entities ?? [])],
+            entities: [User, DemoPage, ...(opts?.entities ?? [])],
             synchronize: true
         }, opts?.connection);
 
@@ -104,7 +108,7 @@ export class GrapheneServer
 
         server.logger.verbose("Setting up api");
         server.schema = await buildSchema({
-            resolvers: [UserResolver, ...(opts?.resolvers ?? [])],
+            resolvers: [UserResolver, DemoPageResolver, ...(opts?.resolvers ?? [])],
             emitSchemaFile: false,
             authChecker: UserService.AuthChecker,
             container: Container
