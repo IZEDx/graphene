@@ -1,8 +1,9 @@
-import { Component, h, Prop, State, Listen } from "@stencil/core";
+import { Component, h, Prop, State, Listen, Event, EventEmitter } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType, GrapheneListType } from "../../../libs/graphene";
 import { pascalCase } from "change-case";
+import { RouterHistory, injectHistory } from "@stencil/router";
 
 @Component({
     tag: 'content-edit',
@@ -10,6 +11,10 @@ import { pascalCase } from "change-case";
 })
 export class ContentEdit 
 {
+    @Event() apiError: EventEmitter<any>;
+    @Event() successToast: EventEmitter<string>;
+
+    @Prop() history: RouterHistory;
     @Prop() params: Record<string, string|number>|undefined;
     @Prop() preferredColumns: string[] = [];
     @Prop() readonlyColumns: string[] = [];
@@ -23,15 +28,16 @@ export class ContentEdit
     @content.Context("canDelete") canDelete: boolean;
     @content.Context("isList") isList: boolean;
 
-    @State() entries: [string, any][];
+    @State() entries: [string, any][]; 
     @State() failed = false;
+    @State() isSaving = false;
+    @State() isDeleting = false;
 
     fieldMap: Record<string, GrapheneField>;
 
     @content.Observe("definition")
     async componentWillLoad()
     {
-        console.log(this);
         try
         {
             const object = (await this.definition.request(this.params))?.[this.definition.name];
@@ -57,7 +63,7 @@ export class ContentEdit
         }
         catch(e)
         {
-            console.error(e);
+            this.apiError.emit(e);
             this.failed = true;
         }
         
@@ -69,13 +75,22 @@ export class ContentEdit
         const entry = this.entries.find(([k]) => k === e.detail.formKey);
         entry[1] = e.detail.value;
         this.entries = this.entries;
-        console.log("Form Update", this.entries);
     }
 
     async onSave()
     {
-        const result = await this.definition.edit(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
-        console.log(result);
+        try
+        {
+            this.isSaving = true;
+            const result = await this.definition.edit<{id: string}>(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
+            this.successToast.emit("Save successful");
+            this.history.push(`/${this.listDef.name}/${result.id}`);
+        }
+        catch(e)
+        {
+            this.apiError.emit(e);
+        } 
+        this.isSaving = false;
     }
 
     get title()
@@ -116,14 +131,30 @@ export class ContentEdit
                 <div class="level-right">
                     { !this.canDelete ? "" : 
                         <div class="level-item">
-                            <button class="button is-danger" onClick={() => this.onSave()}>
+                            <button 
+                                class={{
+                                    "button": true,
+                                    "is-danger": true,
+                                    "is-loading": this.isDeleting
+                                }} 
+                                disabled={this.isDeleting}
+                                onClick={() => {}}
+                            >
                                 Delete &nbsp; <ion-icon name="trash"></ion-icon>
                             </button>
                         </div>
                     }
                     { !this.canEdit ? "" : 
                         <div class="level-item">
-                            <button class="button is-success" onClick={() => this.onSave()}>
+                            <button 
+                                class={{
+                                    "button": true,
+                                    "is-success": true,
+                                    "is-loading": this.isSaving
+                                }} 
+                                disabled={this.isSaving}
+                                onClick={() => this.onSave()}
+                            >
                                 Save &nbsp; <ion-icon name="save"></ion-icon>
                             </button>
                         </div>
@@ -144,102 +175,6 @@ export class ContentEdit
             </gel-form>
         ];
     }
-
-    /*
-
-    renderField(key: string, val: any)
-    {
-        const field = this.definition.type.fieldMap[key];
-        return (
-            <div class="field is-horizontal">
-                <div class="field-label is-normal">
-                    <label class="label">{key.toLocaleUpperCase()}</label>
-                </div>
-                <div class="field-body">
-                    <div class="field">
-                        <p class="control is-expanded">
-                            { field.type.renderEdit(val) }
-                        </p>
-                    </div>
-                </div>
-            </div>
-        );
-    }
-    renderValue(key: string, val: any)
-    {
-        const field = this.definition.type.fieldMap[key];
-        const type = field.type?.["ofType"] ?? field.type;
-
-        switch (type.name)
-        {
-            case "String":
-                return <input class="input" type="text" value={val}></input>;
-            case "DateTime":
-                const disabled = key === "created_at" || key === "updated_at";
-                const date = new Date(val);
-                const day = ("0" + date.getDate()).slice(-2);
-                const month = ("0" + (date.getMonth() + 1)).slice(-2);
-                const hour = ("0" + date.getHours()).slice(-2);
-                const minute = ("0" + date.getMinutes()).slice(-2);
-                console.log(date);
-                const str = date.getFullYear()+"-"+month+"-"+day+"T"+hour+":"+minute;
-                console.log(str);
-                return <input class="input" type="datetime-local" disabled={disabled} value={str}></input>;
-            case "Boolean":
-                return ""+val;
-            default: 
-                return ""+val;
-        }
-    }
-
-    queryFields(t: GraphQLObjectType, c = 3)
-    {
-        return Object.entries(t.getFields())
-            .map(([k, f]) => this.queryType(k, f.type, c))
-            .filter(s => s !== undefined)
-            .join(" ");
-    }
-
-    queryType(key: string, type: GraphQLOutputType, c = 3): string|undefined
-    {
-        if (type instanceof GraphQLScalarType)
-        {
-            return key;
-        }
-
-        else if (type instanceof GraphQLNonNull)
-        {
-            return this.queryType(key, type.ofType, c);
-        }
-
-        else if (type instanceof GraphQLUnionType)
-        {
-            return `${key} { 
-                ${type.getTypes().map(type => this.queryType("... on "+type.name, type, c)).join("\n")}
-            }`;
-        }
-
-        else if (c <= 0) return undefined;
-
-        else if (type instanceof GraphQLList)
-        {
-            return this.queryType(key, type.ofType, c);
-        }
-
-        else if (type instanceof GraphQLObjectType)
-        {
-            return `${key} { 
-                __typename
-                ${this.queryFields(type, c - 1)}
-            }`;
-        }
-
-        return undefined;
-    }
-
-    typeOf<T>(t: any, c: {new(...args: any[]): T}): t is T
-    {
-        return t instanceof c || t?.["ofType"] instanceof c;
-    }
-    */
 }
+
+injectHistory(ContentEdit);

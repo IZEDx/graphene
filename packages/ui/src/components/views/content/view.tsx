@@ -21,6 +21,7 @@ export class ContentView
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("isAuthorized") isAuthorized: boolean;
 
     @content.Provide("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Provide("listDef") listDef: GrapheneQueryField<GrapheneListType>;
@@ -45,6 +46,7 @@ export class ContentView
         await this.refresh();
     }
 
+    @graphene.Observe("graphene")
     @Watch("match")
     async refresh()
     {
@@ -52,7 +54,9 @@ export class ContentView
         this.pushBreadcrumb.emit([this.name, this.match.url]);
         if (this.id) this.pushBreadcrumb.emit([this.id, this.match.url]);
 
-        this.definition = this.graphene.getQuery(this.name)?.asObject();
+        this.definition = this.graphene?.getQuery(this.name)?.asObject();
+        if (!this.definition) return;
+
         this.canCreate = !!this.definition.createMutation;
         this.canEdit = !!this.definition.editMutation;
         this.canDelete = !!this.definition.deleteMutation;
@@ -65,28 +69,29 @@ export class ContentView
 
     render() 
     {
-        console.log("isList", this.isList);
-        return <segment class="segment">
-            <div class="container">
-                <div class="box has-blur-background">
-                    {
-                        ! this.definition
-                        ? <h1>404</h1>
-                        : this.id === "new" && this.isList
-                        ? <content-create></content-create>
-                        : !!this.id || !this.isList
-                        ? <content-edit 
-                            params={this.id ? {id: this.id} : undefined}
-                            preferredColumns={preferredColumns} 
-                            readonlyColumns={readOnlyColumns}
-                        ></content-edit>
-                        : <content-list 
-                            preferredColumns={preferredColumns} 
-                            preferredEndColumns={preferredEndColumns}
-                        ></content-list>
-                    }
+        return <util-guard>
+            <segment class="segment">
+                <div class="container">
+                    <div class="box has-blur-background">
+                        {
+                            ! this.definition
+                            ? <h1>404</h1>
+                            : this.id === "new" && this.isList
+                            ? <content-create></content-create>
+                            : !!this.id || !this.isList
+                            ? <content-edit 
+                                params={this.id ? {id: this.id} : undefined}
+                                preferredColumns={preferredColumns} 
+                                readonlyColumns={readOnlyColumns}
+                            ></content-edit>
+                            : <content-list 
+                                preferredColumns={preferredColumns} 
+                                preferredEndColumns={preferredEndColumns}
+                            ></content-list>
+                        }
+                    </div>
                 </div>
-            </div>
-        </segment>;
+            </segment>
+        </util-guard>;
     }
 }

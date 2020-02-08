@@ -1,4 +1,4 @@
-import { Component, h, Event, EventEmitter, Listen } from "@stencil/core";
+import { Component, h, Event, EventEmitter, Listen, State } from "@stencil/core";
 import { graphene } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 
@@ -10,6 +10,10 @@ import { GrapheneAPI } from "../../../global/api";
 export class LoginView 
 {
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
+    @Event() login: EventEmitter<{name: string, password: string}>;
+    @Event() clearBreadcrumb: EventEmitter<void>;
+
+    @State() isLoading = false;
 
     @graphene.Context("api") api: GrapheneAPI;
     form = {
@@ -19,27 +23,21 @@ export class LoginView
 
     componentWillLoad()
     {
+        this.clearBreadcrumb.emit();
         this.pushBreadcrumb.emit(["Login", "/login"]);
     }
 
-    async onLogin()
+    @graphene.Observe("isAuthorized")
+    onAuthorization()
     {
-        const loginQuery = `
-            mutation {
-                login(data: {
-                    name: "${this.form.name}",
-                    password: "${this.form.password}"
-                })
-            }
-        `;
+        this.isLoading = false;
+    }
 
-        const result = await this.api.client.request(loginQuery);
-        const token = result?.login;
-        if (token)
-        {
-            localStorage.setItem("token", token);
-            this.api.setToken(localStorage.getItem("token"));
-        }
+    @Listen("submit")
+    onSubmit()
+    {
+        this.isLoading = true;
+        this.login.emit(this.form);
     }
 
     @Listen("inputUpdate")
@@ -56,7 +54,7 @@ export class LoginView
                     <div class="box content has-blur-background">
                         <div class="level">
                             <div class="level-item">
-                                <h1>Login</h1>
+                                <h1>Graphene</h1>
                             </div>
                         </div>
                         <div class="level">
@@ -85,7 +83,17 @@ export class LoginView
                                     </div>
                                     <div class="level-right">
                                         <div class="level-item">
-                                            <button class="button is-primary" onClick={() => this.onLogin()}>Login</button>
+                                            <button 
+                                                class={{
+                                                    "button": true,
+                                                    "is-primary": true,
+                                                    "is-loading": this.isLoading
+                                                }} 
+                                                disabled={this.isLoading}
+                                                onClick={() => this.onSubmit()}
+                                            >
+                                                Login
+                                            </button>
                                         </div>
                                     </div>
                                 </div>

@@ -38,9 +38,7 @@ export class ContentList
 
         try
         {
-            console.log(this.listDef.type.getType(GrapheneListType));
             const type = this.listDef.type.getType(GrapheneListType).ofType.getType(GrapheneObjectType);
-            console.log(this.listDef.type.getType(GrapheneListType));
             this.fieldMap = type.fieldMap;
     
             const preferred = this.preferredColumns.filter(s => this.fieldMap[s] !== undefined);
@@ -74,50 +72,6 @@ export class ContentList
         }
     }
 
-    /*
-    @Watch("match")
-    async componentWillLoad()
-    {
-        if (!this.definition) return;
-
-        const list = this.definition.type.ofType;
-        const nonnull = list.isList() ? list.ofType : list;
-        const type = nonnull.isNonNull() ? nonnull.ofType : nonnull;
-
-        console.log(type);
-
-        if (!(type instanceof GrapheneObjectType)) return;
-        this.fieldMap = type.fieldMap;
-        
-        const preferred = preferredColumns.filter(s => this.fieldMap[s] !== undefined);
-        const preferredEnd = preferredEndColumns.filter(s => this.fieldMap[s] !== undefined);
-        const rest = Object.keys(this.fieldMap).filter(s => !preferred.includes(s) && !preferredEnd.includes(s));
-
-        console.log(preferred, preferredEnd, rest);
-
-        this.columns = [
-            ...preferred, 
-            ...rest.slice(0, this.columnCount - preferred.length - preferredEnd.length),
-            ...preferredEnd
-        ]
-        .map(col => this.fieldMap[col])
-        .filter(field => !!field.type.getType(GrapheneScalarType))
-        .map(field => field.name);
-
-        const request = `{
-            ${this.definition.name} {
-                ${this.columns.join(" ")}
-            }
-        }`;
-
-        //console.log(request);
-
-        this.values = (await this.api.client.request(request))[this.definition.name];
-
-        this.updateRows();
-    }
-    */
-
     updateRows(searchBy?: string)
     {
         this.rows = [];
@@ -128,7 +82,6 @@ export class ContentList
             for (const [col, val] of Object.entries(this.values[idx]))
             {
                 const cellType = this.fieldMap[col].type;
-                console.log("Rendering ", col, val, cellType, cellType.renderCell(val));
                 if (!searchBy || cellType.renderCell(val).toString().includes(searchBy)) checksFilter = true;
 
                 this.rows[c] = this.rows[c] ?? {};

@@ -13,12 +13,20 @@ export class GrapheneNav
 {
     @graphene.Context("graphene") graphene: Graphene;
     @graphene.Context("connected") isConnected: boolean;
+    @graphene.Context("isAuthorized") isAuthorized: boolean;
     @nav.Context("isExpanded") isExpanded: boolean;
 
-    @State() categories: Category[];
+    @State() categories: Category[] = [];
 
-    async componentWillLoad()
+    @graphene.Observe("graphene")
+    async onGraphene()
     {
+        if (!this.graphene)
+        {
+            this.categories = [];
+            return;
+        }
+        
         this.categories = [
             {
                 name: "General",
@@ -61,7 +69,7 @@ export class GrapheneNav
     }
 
     render() {
-        return (
+        return !this.isConnected || !this.isAuthorized ? "" : (
             <div class={mergeClass("dashboard-panel is-scrollable is-medium", {"is-hidden-mobile": !this.isExpanded})}>
                 <header class="dashboard-panel-header">
                     <div class="has-text-centered header content">

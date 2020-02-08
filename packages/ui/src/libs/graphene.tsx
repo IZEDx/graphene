@@ -37,6 +37,7 @@ export class Graphene
 
         log("Analyzing mutation fields");
         const mutationFields = this.schema.getMutationType().getFields();
+        this.mutationFields = [];
         for (const [k, f] of Object.entries(mutationFields))
         {
             this.mutationFields.push(await GrapheneField.create(k, f));
@@ -45,6 +46,7 @@ export class Graphene
         
         log("Analyzing query fields");
         const queryFields = this.schema.getQueryType().getFields();
+        this.queryFields = [];
         for (const [k, f] of Object.entries(queryFields))
         {
             this.queryFields.push(await GrapheneQueryField.create(k, f, this));
@@ -205,7 +207,7 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         return this as any;
     }
 
-    async edit(data: any)
+    async edit<R = T>(data: any)
     {
         if (!this.editMutation) return;
 
@@ -219,7 +221,7 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         }`;
         
         console.log(query);
-        return this.graphene.api.client.request<T>(query);
+        return this.graphene.api.client.request<R>(query);
     }
 
     async create(data: any)
@@ -300,7 +302,6 @@ export abstract class GrapheneType<T extends GraphQLOutputType|GraphQLInputType 
 
     getType<R extends GrapheneType>(type: Function&{create(...args: any[]): Promise<R>}, c = 5): R|undefined
     {
-        console.log("getType", this, type);
         if (c < 0) return undefined;
         if (this instanceof type) return this as any;
         if (this.isNonNull()) return this.ofType?.getType(type, c - 1);

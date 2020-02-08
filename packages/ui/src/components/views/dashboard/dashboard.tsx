@@ -12,6 +12,7 @@ export class DashboardView
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
 
     @graphene.Context("api") api: GrapheneAPI;
+    @graphene.Context("isAuthorized") isAuthorized: boolean;
 
     componentWillLoad()
     {
@@ -20,9 +21,10 @@ export class DashboardView
 
     render()
     {
-        console.log();
-        return <div class="content">
-            <h1>Welcome to Graphene</h1>
-        </div>;
+        return <util-guard>
+            <div class="content">
+                <h1>Welcome to Graphene</h1>
+            </div>
+        </util-guard>;
     }
 } 

@@ -1,15 +1,16 @@
 import { Component, h, Prop } from "@stencil/core";
 import { Breadcrumbs } from "./model";
 import { ClassList, mergeClass } from "../../../libs/utils";
+import { breadcrumb } from "../../../global/context";
 
 
 @Component({
     tag: 'gel-breadcrumbs',
     //styleUrl: 'gel-menu.scss',
 })
-export class GELMenu 
+export class GELBreadcrumbs 
 {
-    @Prop() breadcrumbs: Breadcrumbs = [];
+    @breadcrumb.Context("breadcrumbs") breadcrumbs: Breadcrumbs = [];
 
     @Prop() breadcrumbClass: ClassList = {};
     @Prop() anchorClass: ClassList = {};

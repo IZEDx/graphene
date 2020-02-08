@@ -1,12 +1,6 @@
-import { Component, Prop, h, Host, Listen, State } from '@stencil/core';
-import { graphene, nav } from '../../global/context';
-import { GrapheneAPI, APIQueries } from '../../global/api';
-import { API } from '../../libs/api';
+import { Component, Prop, h, Listen, State } from '@stencil/core';
+import { nav } from '../../global/context';
 import "@stencil/router";
-import { Breadcrumbs } from '../elements/breadcrumbs/model';
-import { pascalCase } from "change-case";
-import { MenuItem } from '../elements/menu/model';
-import { Graphene } from '../../libs/graphene';
 
 @Component({
     tag: 'graphene-ui',
@@ -17,126 +11,80 @@ export class GrapheneUI
     @Prop() endPoint: string;
     @Prop() token?: string;
 
-    @State() breadcrumb: Breadcrumbs = [["Dashboard", "/"]];
-
-    @graphene.Provide("api") api: GrapheneAPI;
-    @graphene.Provide("graphene") graphene: Graphene;
-    @graphene.Provide("connected") isConnected = false;
-    @graphene.Provide("authorized") isAuthorized = false;
-
     @nav.Provide("isExpanded") isExpanded = false;
 
-    async componentWillLoad()
+    @State() showBackground = false;
+
+
+    @Listen("toggleBackground")
+    onToggleBackground(e: CustomEvent<boolean>)
     {
-        this.api = new API(this.endPoint, APIQueries, this.token ?? localStorage.getItem("token"));
-        this.graphene = new Graphene(this.api);
-        this.breadcrumb = [[this.endPoint, "/"]];
-
-        await this.graphene.load();
-
-        try
-        {
-            const meField = this.graphene.getQuery("me");
-            const me = (await meField?.request())[meField?.name];
-            if (me) this.isAuthorized = true;
-            else this.isAuthorized = false;
-        } catch(err)
-        {
-            this.isAuthorized = false;
-        }
-
-        this.isConnected = true;
-        console.log(this.graphene);
+        this.showBackground = e.detail;
     }
 
-    @Listen("pushBreadcrumb")
-    onPushBreadcrumb(e: CustomEvent<[string, string]>)
+    render() 
     {
-        const text = e.detail[0].startsWith("http") ? e.detail[0] : pascalCase(e.detail[0]);
-        const bc = [text, e.detail[1]] as [string, string];
-        this.breadcrumb = [...this.breadcrumb, bc]
-            .slice(0, this.breadcrumb.findIndex(b => b[0] === bc[0]) + 1 || undefined);;
-    }
-
-    @Listen("popBreadcrumb")
-    onPopBreadcrumb()
-    {
-        this.breadcrumb = this.breadcrumb.slice(0, this.breadcrumb.length - 1);
-    }
-
-    @Listen("clearBreadcrumb")
-    onClearBreadcrumb()
-    {
-        this.breadcrumb = [this.breadcrumb[0]];
-    }
-
-    @Listen("pageLeave")
-    onPageLeave(page: any)
-    {
-        console.log("Page Leave", page);
-        this.breadcrumb = this.breadcrumb.slice(0, this.breadcrumb.length - 1);
-    }
-
-    @Listen("navigate")
-    onNavigate(_item: MenuItem)
-    {
-        this.isExpanded = false;
-    }
-
-    render() {
         const routeListener = (props: any) => <util-route-listener props={props} />;
-        return (
-            <Host>
-                <div class="dashboard is-full-height">
-                    { !this.isAuthorized ? ""
-                        : <graphene-nav></graphene-nav>
-                    }
-                    
 
-                    <div class="dashboard-main">
-                        <nav class="navbar">
-                            <div class="navbar-brand">
-                                <span class="navbar-item is-hidden-mobile">
-                                    <gel-breadcrumbs breadcrumbs={this.breadcrumb}></gel-breadcrumbs>
-                                </span> 
-                                <span role="button" class="navbar-burger burger is-hidden-tablet" aria-label="menu" aria-expanded={this.isExpanded} onClick={() => this.isExpanded = !this.isExpanded}>
-                                    <span aria-hidden="true"></span>
-                                    <span aria-hidden="true"></span> 
-                                    <span aria-hidden="true"></span>
-                                </span>
-                            </div>
-                        </nav>
+        return this.wrapProviders(
+            <div class="dashboard is-full-height">
+                <graphene-nav></graphene-nav>
 
-                        <div class="body is-fullheight" onClick={() => {
-                            this.isExpanded = false;
-                        }}>
-                            { !this.isAuthorized
-                            ? <view-login></view-login>
-                            : (
-                                <stencil-router >
-                                    <stencil-route-switch scrollTopOffset={0}>
-                                        <stencil-route url="/login" component="view-login" routeRender={routeListener} />
-                                        <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
-                                        <stencil-route url="/:name/:id" component="view-content" routeRender={routeListener} />
-                                        <stencil-route url="/:name" component="view-content" routeRender={routeListener} />
-                                        <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
-                                    </stencil-route-switch>
-                                </stencil-router>
-                            )}
+                <div class={{
+                    "dashboard-main": true,
+                    "has-background": this.showBackground
+                }}>
+                    <nav class="navbar">
+                        <div class="navbar-brand">
+                            <span class="navbar-item is-hidden-mobile">
+                                <gel-breadcrumbs></gel-breadcrumbs>
+                            </span> 
+                            <span role="button" class="navbar-burger burger is-hidden-tablet" aria-label="menu" aria-expanded={this.isExpanded} onClick={() => this.isExpanded = !this.isExpanded}>
+                                <span aria-hidden="true"></span>
+                                <span aria-hidden="true"></span> 
+                                <span aria-hidden="true"></span>
+                            </span>
                         </div>
+                    </nav>
 
-                        {/*
-                            <footer class="footer">
-                                Footer
-                            </footer>
-                        */}
+                    <div class="body is-fullheight" onClick={() => {
+                        this.isExpanded = false;
+                    }}>
+                        <stencil-router >
+                            <stencil-route-switch scrollTopOffset={0}>
+                                <stencil-route url="/login" component="view-login" routeRender={routeListener} />
+                                <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
+                                <stencil-route url="/:name/:id" component="view-content" routeRender={routeListener} />
+                                <stencil-route url="/:name" component="view-content" routeRender={routeListener} />
+                                <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
+                            </stencil-route-switch>
+                        </stencil-router>
                     </div>
+
                     {/*
-                        <div class="dashboard-panel is-small">
-                        </div>
+                        <footer class="footer">
+                            Footer
+                        </footer>
                     */}
                 </div>
-            </Host>
+                {/*
+                    <div class="dashboard-panel is-small">
+                    </div>
+                */}
+            </div>
+        );
+    }
+
+    wrapProviders(jsx: any)
+    {
+        return (
+            <notification-provider>
+                <graphene-provider endPoint={this.endPoint} token={this.token}>
+                    <breadcrumb-provider>
+                        {jsx}
+                    </breadcrumb-provider>
+                </graphene-provider>
+            </notification-provider>
         )
     }
 }

@@ -8,25 +8,24 @@
 
 import { HTMLStencilElement, JSXBase } from '@stencil/core/internal';
 import {
-  Breadcrumbs,
-} from './components/elements/breadcrumbs/model';
-import {
-  ClassList,
-} from './libs/utils';
-import {
   LocationSegments,
   MatchResults,
   RouteRenderProps,
   RouterHistory,
 } from '@stencil/router';
 import {
+  ClassList,
+} from './libs/utils';
+import {
   Category,
   MenuItem,
 } from './components/elements/menu/model';
 
 export namespace Components {
+  interface BreadcrumbProvider {}
   interface ContentCreate {}
   interface ContentEdit {
+    'history': RouterHistory;
     'params': Record<string, string|number>|undefined;
     'preferredColumns': string[];
     'readonlyColumns': string[];
@@ -39,7 +38,6 @@ export namespace Components {
   interface GelBreadcrumbs {
     'anchorClass': ClassList;
     'breadcrumbClass': ClassList;
-    'breadcrumbs': Breadcrumbs;
   }
   interface GelForm {}
   interface GelInputSelect {
@@ -85,10 +83,16 @@ export namespace Components {
     'sortBy': string;
   }
   interface GrapheneNav {}
+  interface GrapheneProvider {
+    'endPoint': string;
+    'token'?: string;
+  }
   interface GrapheneUi {
     'endPoint': string;
     'token'?: string;
   }
+  interface NotificationProvider {}
+  interface UtilGuard {}
   interface UtilRouteListener {
     'props': RouteRenderProps | undefined;
   }
@@ -102,6 +106,12 @@ export namespace Components {
 
 declare global {
 
+
+  interface HTMLBreadcrumbProviderElement extends Components.BreadcrumbProvider, HTMLStencilElement {}
+  var HTMLBreadcrumbProviderElement: {
+    prototype: HTMLBreadcrumbProviderElement;
+    new (): HTMLBreadcrumbProviderElement;
+  };
 
   interface HTMLContentCreateElement extends Components.ContentCreate, HTMLStencilElement {}
   var HTMLContentCreateElement: {
@@ -169,10 +179,28 @@ declare global {
     new (): HTMLGrapheneNavElement;
   };
 
+  interface HTMLGrapheneProviderElement extends Components.GrapheneProvider, HTMLStencilElement {}
+  var HTMLGrapheneProviderElement: {
+    prototype: HTMLGrapheneProviderElement;
+    new (): HTMLGrapheneProviderElement;
+  };
+
   interface HTMLGrapheneUiElement extends Components.GrapheneUi, HTMLStencilElement {}
   var HTMLGrapheneUiElement: {
     prototype: HTMLGrapheneUiElement;
     new (): HTMLGrapheneUiElement;
+  };
+
+  interface HTMLNotificationProviderElement extends Components.NotificationProvider, HTMLStencilElement {}
+  var HTMLNotificationProviderElement: {
+    prototype: HTMLNotificationProviderElement;
+    new (): HTMLNotificationProviderElement;
+  };
+
+  interface HTMLUtilGuardElement extends Components.UtilGuard, HTMLStencilElement {}
+  var HTMLUtilGuardElement: {
+    prototype: HTMLUtilGuardElement;
+    new (): HTMLUtilGuardElement;
   };
 
   interface HTMLUtilRouteListenerElement extends Components.UtilRouteListener, HTMLStencilElement {}
@@ -205,6 +233,7 @@ declare global {
     new (): HTMLViewLogoutElement;
   };
   interface HTMLElementTagNameMap {
+    'breadcrumb-provider': HTMLBreadcrumbProviderElement;
     'content-create': HTMLContentCreateElement;
     'content-edit': HTMLContentEditElement;
     'content-list': HTMLContentListElement;
@@ -216,7 +245,10 @@ declare global {
     'gel-menu': HTMLGelMenuElement;
     'gel-table': HTMLGelTableElement;
     'graphene-nav': HTMLGrapheneNavElement;
+    'graphene-provider': HTMLGrapheneProviderElement;
     'graphene-ui': HTMLGrapheneUiElement;
+    'notification-provider': HTMLNotificationProviderElement;
+    'util-guard': HTMLUtilGuardElement;
     'util-route-listener': HTMLUtilRouteListenerElement;
     'view-content': HTMLViewContentElement;
     'view-dashboard': HTMLViewDashboardElement;
@@ -226,8 +258,12 @@ declare global {
 }
 
 declare namespace LocalJSX {
+  interface BreadcrumbProvider {}
   interface ContentCreate {}
   interface ContentEdit {
+    'history'?: RouterHistory;
+    'onApiError'?: (event: CustomEvent<any>) => void;
+    'onSuccessToast'?: (event: CustomEvent<string>) => void;
     'params'?: Record<string, string|number>|undefined;
     'preferredColumns'?: string[];
     'readonlyColumns'?: string[];
@@ -240,7 +276,6 @@ declare namespace LocalJSX {
   interface GelBreadcrumbs {
     'anchorClass'?: ClassList;
     'breadcrumbClass'?: ClassList;
-    'breadcrumbs'?: Breadcrumbs;
   }
   interface GelForm {}
   interface GelInputSelect {
@@ -290,10 +325,19 @@ declare namespace LocalJSX {
     'sortBy'?: string;
   }
   interface GrapheneNav {}
+  interface GrapheneProvider {
+    'endPoint'?: string;
+    'onErrorToast'?: (event: CustomEvent<string>) => void;
+    'onSuccessToast'?: (event: CustomEvent<string>) => void;
+    'onToggleBackground'?: (event: CustomEvent<boolean>) => void;
+    'token'?: string;
+  }
   interface GrapheneUi {
     'endPoint'?: string;
     'token'?: string;
   }
+  interface NotificationProvider {}
+  interface UtilGuard {}
   interface UtilRouteListener {
     'onPageDidUpdate'?: (event: CustomEvent<LocationSegments>) => void;
     'onPageEnter'?: (event: CustomEvent<LocationSegments>) => void;
@@ -310,13 +354,18 @@ declare namespace LocalJSX {
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
   interface ViewLogin {
+    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onLogin'?: (event: CustomEvent<{name: string, password: string}>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
   interface ViewLogout {
+    'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
+    'onLogout'?: (event: CustomEvent<void>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
   }
 
   interface IntrinsicElements {
+    'breadcrumb-provider': BreadcrumbProvider;
     'content-create': ContentCreate;
     'content-edit': ContentEdit;
     'content-list': ContentList;
@@ -328,7 +377,10 @@ declare namespace LocalJSX {
     'gel-menu': GelMenu;
     'gel-table': GelTable;
     'graphene-nav': GrapheneNav;
+    'graphene-provider': GrapheneProvider;
     'graphene-ui': GrapheneUi;
+    'notification-provider': NotificationProvider;
+    'util-guard': UtilGuard;
     'util-route-listener': UtilRouteListener;
     'view-content': ViewContent;
     'view-dashboard': ViewDashboard;
@@ -343,6 +395,7 @@ export { LocalJSX as JSX };
 declare module "@stencil/core" {
   export namespace JSX {
     interface IntrinsicElements {
+      'breadcrumb-provider': LocalJSX.BreadcrumbProvider & JSXBase.HTMLAttributes<HTMLBreadcrumbProviderElement>;
       'content-create': LocalJSX.ContentCreate & JSXBase.HTMLAttributes<HTMLContentCreateElement>;
       'content-edit': LocalJSX.ContentEdit & JSXBase.HTMLAttributes<HTMLContentEditElement>;
       'content-list': LocalJSX.ContentList & JSXBase.HTMLAttributes<HTMLContentListElement>;
@@ -354,7 +407,10 @@ declare module "@stencil/core" {
       'gel-menu': LocalJSX.GelMenu & JSXBase.HTMLAttributes<HTMLGelMenuElement>;
       'gel-table': LocalJSX.GelTable & JSXBase.HTMLAttributes<HTMLGelTableElement>;
       'graphene-nav': LocalJSX.GrapheneNav & JSXBase.HTMLAttributes<HTMLGrapheneNavElement>;
+      'graphene-provider': LocalJSX.GrapheneProvider & JSXBase.HTMLAttributes<HTMLGrapheneProviderElement>;
       'graphene-ui': LocalJSX.GrapheneUi & JSXBase.HTMLAttributes<HTMLGrapheneUiElement>;
+      'notification-provider': LocalJSX.NotificationProvider & JSXBase.HTMLAttributes<HTMLNotificationProviderElement>;
+      'util-guard': LocalJSX.UtilGuard & JSXBase.HTMLAttributes<HTMLUtilGuardElement>;
       'util-route-listener': LocalJSX.UtilRouteListener & JSXBase.HTMLAttributes<HTMLUtilRouteListenerElement>;
       'view-content': LocalJSX.ViewContent & JSXBase.HTMLAttributes<HTMLViewContentElement>;
       'view-dashboard': LocalJSX.ViewDashboard & JSXBase.HTMLAttributes<HTMLViewDashboardElement>;
