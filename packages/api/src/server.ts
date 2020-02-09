@@ -103,9 +103,9 @@ export class GrapheneServer
                 return null;
             }
         }));
-
+ 
         
-
+ 
         server.logger.verbose("Setting up api");
         server.schema = await buildSchema({
             resolvers: [UserResolver, DemoPageResolver, ...(opts?.resolvers ?? [])],
@@ -119,7 +119,7 @@ export class GrapheneServer
             validationRules: [depthLimit(7)],
             context: ({req, res}) => {
                 const user = (req as any).user ?? {};
-                server.logger.debug("context user", user);
+                //server.logger.debug("context user", user);
                 return { req, res, user } as GrapheneContext;
             },
         });

@@ -1,7 +1,7 @@
 import { Component, h, Prop, State, Listen, Event, EventEmitter } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType, GrapheneListType } from "../../../libs/graphene";
+import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneListType, GrapheneInputObjectType } from "../../../libs/graphene";
 import { pascalCase } from "change-case";
 import { RouterHistory, injectHistory } from "@stencil/router";
 
@@ -34,6 +34,7 @@ export class ContentEdit
     @State() isDeleting = false;
 
     fieldMap: Record<string, GrapheneField>;
+    editType: GrapheneInputObjectType;
 
     @content.Observe("definition")
     async componentWillLoad()
@@ -42,6 +43,14 @@ export class ContentEdit
         {
             const object = (await this.definition.request(this.params))?.[this.definition.name];
         
+            this.editType = this.definition.editMutation.args.find(a => a.name === "data").type.getType(GrapheneInputObjectType);
+
+            if (!this.editType)
+            {
+                console.log(this.definition.editMutation.args);
+                this.failed = true;
+                return;
+            }
 
             this.entries = Object.entries(object)
                 .sort((a, b) => {
@@ -109,6 +118,8 @@ export class ContentEdit
     render() 
     {
 
+        console.log("readonly", this.readonlyColumns, this.definition.type);
+
         return this.failed ? "Something went wrong" : [
             <div class="level is-mobile">
                 <div class="level-left">
@@ -162,7 +173,8 @@ export class ContentEdit
                 </div>
             </div>,
             <gel-form>
-                { this.entries?.map(([key, value]) => {
+                { this.editType.renderEdit(this.entries.reduce((a, b) => ({...a, [b[0]]: b[1]}), {}), this.readonlyColumns) }
+                {/* this.entries?.map(([key, value]) => {
                     const {type, name} = this.fieldMap[key];
                     return type?.renderEdit({ 
                         formKey: key, 
@@ -171,7 +183,7 @@ export class ContentEdit
                         options: type.getType(GrapheneEnumType)?.values,
                         disabled: this.readonlyColumns.findIndex(v => v === key) > -1
                     })
-                }) }
+                })*/ }
             </gel-form>
         ];
     }

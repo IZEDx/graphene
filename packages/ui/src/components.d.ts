@@ -14,6 +14,10 @@ import {
   RouterHistory,
 } from '@stencil/router';
 import {
+  GrapheneObjectType,
+  GrapheneQueryField,
+} from './libs/graphene';
+import {
   ClassList,
 } from './libs/utils';
 import {
@@ -32,6 +36,7 @@ export namespace Components {
   }
   interface ContentList {
     'columnCount': number;
+    'definition': GrapheneQueryField<GrapheneObjectType>;
     'preferredColumns': string[];
     'preferredEndColumns': string[];
   }
@@ -270,6 +275,7 @@ declare namespace LocalJSX {
   }
   interface ContentList {
     'columnCount'?: number;
+    'definition'?: GrapheneQueryField<GrapheneObjectType>;
     'preferredColumns'?: string[];
     'preferredEndColumns'?: string[];
   }

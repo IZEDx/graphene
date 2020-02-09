@@ -106,16 +106,18 @@ export class GrapheneProvider
         if (!this.api)
         {
             this.api = new API(this.endPoint, APIQueries, token);
-            graphene = new Graphene(this.api);
+            graphene = new Graphene(this.api, {}, {});
         }
         else
         {
             this.api.setToken(token);
         }
 
+        
+
         await graphene.load();
         this.graphene = graphene;
-        
+
         try
         {
             const meField = this.graphene.getQuery("me");

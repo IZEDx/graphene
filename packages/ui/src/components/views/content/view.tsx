@@ -48,11 +48,9 @@ export class ContentView
 
     @graphene.Observe("graphene")
     @Watch("match")
-    async refresh()
+    async refresh(_graphene?: any)
     {
         this.clearBreadcrumb.emit();
-        this.pushBreadcrumb.emit([this.name, this.match.url]);
-        if (this.id) this.pushBreadcrumb.emit([this.id, this.match.url]);
 
         this.definition = this.graphene?.getQuery(this.name)?.asObject();
         if (!this.definition) return;
@@ -62,6 +60,9 @@ export class ContentView
         this.canDelete = !!this.definition.deleteMutation;
         this.isList = !!this.definition.asList().type.getType(GrapheneListType);
         this.listDef = this.isList ? this.definition.asList() : undefined;
+
+        this.pushBreadcrumb.emit([this.name, "/" + (this.listDef?.name ?? this.name)]);
+        if (this.id) this.pushBreadcrumb.emit([this.id, this.match.url]);
 
         //console.log(this.definition.asList());
     }
@@ -85,6 +86,7 @@ export class ContentView
                                 readonlyColumns={readOnlyColumns}
                             ></content-edit>
                             : <content-list 
+                                definition={this.definition}
                                 preferredColumns={preferredColumns} 
                                 preferredEndColumns={preferredEndColumns}
                             ></content-list>

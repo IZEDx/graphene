@@ -1,8 +1,8 @@
-import { Component, h, Prop, State } from "@stencil/core";
+import { Component, h, Prop, State, Watch } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { pascalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
-import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneScalarType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
+import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
 import { GraphQLOutputType } from "graphql";
 
 @Component({
@@ -13,11 +13,11 @@ export class ContentList
     @Prop() columnCount = 8;
     @Prop() preferredColumns: string[] = [];
     @Prop() preferredEndColumns: string[] = [];
+    @Prop() definition: GrapheneQueryField<GrapheneObjectType>;
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
 
-    @content.Context("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Context("listDef") listDef: GrapheneQueryField<GrapheneListType>;
     @content.Context("canCreate") canCreate: boolean;
     @content.Context("canEdit") canEdit: boolean;
@@ -31,10 +31,10 @@ export class ContentList
 
     fieldMap: Record<string, GrapheneField<GrapheneType<GraphQLOutputType>>>;
 
-    @content.Observe("listDef")
+    @Watch("definition")
     async componentWillLoad()
     {
-        if (!this.listDef) return;
+        if (!this.listDef || !this.definition) return;
 
         try
         {
@@ -51,12 +51,12 @@ export class ContentList
                 ...preferredEnd
             ]
             .map(col => this.fieldMap[col])
-            .filter(field => !!field.type.getType(GrapheneScalarType))
+            //.filter(field => !!field.type.getType(GrapheneScalarType))
             .map(field => field.name);
             
             const query = `{
                 ${this.listDef.name} {
-                    ${this.columns.join(" ")}
+                    ${this.columns.map(c => this.fieldMap[c].toQuery()).join(" ")}
                 }
             }`;
 
@@ -123,7 +123,7 @@ export class ContentList
                     </div>
                     <div class="level-item">
                         { !this.definition.createMutation ? "" : 
-                            <stencil-route-link url={"/"+this.definition.name+"/new"}>
+                            <stencil-route-link url={"/"+this.listDef.name+"/new"}>
                                 <button class="button is-success">
                                     New &nbsp; <ion-icon name="add-circle-outline"></ion-icon>
                                 </button>

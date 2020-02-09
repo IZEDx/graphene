@@ -17,6 +17,7 @@
     "sqlite3": "^4.1.1"
   },
   "devDependencies": {
+    "@graphql-codegen/visitor-plugin-common": "^1.12.2",
     "@stencil/core": "latest",
     "@stencil/router": "latest",
     "@stencil/sass": "latest",
