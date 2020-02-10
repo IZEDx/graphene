@@ -86,8 +86,8 @@ export class ContentCreate
                 <div class="level-left">
                     <div class="level-item">
                         <stencil-route-link url={"/"+this.listDef.name}>
-                            <button class="button is-outlined">
-                                <ion-icon name="return-left"></ion-icon>
+                            <button class="button is-white">
+                                <ion-icon name="chevron-back-outline"></ion-icon>
                             </button>
                         </stencil-route-link>
                     </div>
