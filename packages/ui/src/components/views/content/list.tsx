@@ -4,6 +4,7 @@ import { pascalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
 import { GraphQLOutputType } from "graphql";
+import { injectHistory, RouterHistory } from "@stencil/router";
 
 @Component({
     tag: 'content-list'
@@ -14,6 +15,7 @@ export class ContentList
     @Prop() preferredColumns: string[] = [];
     @Prop() preferredEndColumns: string[] = [];
     @Prop() definition: GrapheneQueryField<GrapheneObjectType>;
+    @Prop() history: RouterHistory;
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
@@ -123,11 +125,9 @@ export class ContentList
                     </div>
                     <div class="level-item">
                         { !this.definition.createMutation ? "" : 
-                            <stencil-route-link url={"/"+this.listDef.name+"/new"}>
-                                <button class="button is-success">
-                                    New &nbsp; <ion-icon name="add-circle-outline"></ion-icon>
-                                </button>
-                            </stencil-route-link>
+                            <button class="button is-success" onClick={() => this.history.push(`/${this.listDef.name}/new`, {})}>
+                                New &nbsp; <ion-icon name="add-circle-outline"></ion-icon>
+                            </button> 
                         }
                     </div>
                 </div>
@@ -143,3 +143,5 @@ export class ContentList
     }
 
 }
+
+injectHistory(ContentList);

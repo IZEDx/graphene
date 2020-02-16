@@ -1,8 +1,8 @@
 import { Service, Inject } from "typedi";
 import { GrapheneServer, GrapheneContext } from "../server";
 import User from "../models/User";
-import { EditUserInput } from "../inputs/EditUserInput";
-import { CreateUserInput } from "../inputs/CreateUserInput";
+import { EditUserInput } from "../resolvers/user/EditUserInput";
+import { CreateUserInput } from "../resolvers/user/CreateUserInput";
 import { compare, hash } from "../libs/bcrypt";
 import { passwordMask } from "../models/scalars/Password";
 import jwt from "jsonwebtoken";

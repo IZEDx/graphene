@@ -42,6 +42,7 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
         {
             case "DateTime": return <gel-input-text {...props} key={props.key}></gel-input-text>;
             case "Boolean": return <gel-input-switch {...props} key={props.key}></gel-input-switch>;
+            case "RichContent": return <gel-input-rich {...props} key={props.key}></gel-input-rich>;
             case "Password": return <gel-input-text {...props} key={props.key} type="password" autoComplete="new-password"></gel-input-text>;
             default: 
                 const renderer = this.graphene.inputRenderers[this.type.name];

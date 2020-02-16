@@ -37,6 +37,7 @@ export namespace Components {
   interface ContentList {
     'columnCount': number;
     'definition': GrapheneQueryField<GrapheneObjectType>;
+    'history': RouterHistory;
     'preferredColumns': string[];
     'preferredEndColumns': string[];
   }
@@ -276,6 +277,7 @@ declare namespace LocalJSX {
   interface ContentList {
     'columnCount'?: number;
     'definition'?: GrapheneQueryField<GrapheneObjectType>;
+    'history'?: RouterHistory;
     'preferredColumns'?: string[];
     'preferredEndColumns'?: string[];
   }
