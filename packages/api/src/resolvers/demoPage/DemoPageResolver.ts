@@ -4,7 +4,6 @@ import { GrapheneContext } from "../../server";
 import { Service } from "typedi";
 import DemoPage from "../../models/DemoPage";
 import { DemoPageService } from "../../services/DemoPageService";
-import { PageContentUnion } from "../../models/unions/PageContentUnion";
 import { RichContent } from "../../models/scalars/RichContent";
 
 @InputType()
@@ -12,7 +11,7 @@ export class CreatePageInput {
     @Field()
     title: string;
 
-    @Field()
+    @Field(type => RichContent)
     content: string;
 }
 

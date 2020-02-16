@@ -19,6 +19,8 @@ import { UserService } from './services/UserService';
 import { ColorfulChalkLogger, DEBUG } from "colorful-chalk-logger";
 import DemoPage from './models/DemoPage';
 import DemoPageResolver from './resolvers/demoPage/DemoPageResolver';
+import GrapheneConfig from './models/GrapheneConfig';
+import GrapheneConfigResolver from './resolvers/grapheneConfig/GrapheneConfigResolver';
 
 const www = join(__dirname, "..", "..", "ui", "www");
 const indexHtml = join(www, "index.html");
@@ -41,6 +43,10 @@ export interface GrapheneOptions
     hostname?: string;
     secret?: string;
     adminPassword?: string;
+    customHead?: string;
+    inputRenderers?: Record<string, string>;
+    cellRenderers?: Record<string, string>;
+    demoMode?: boolean;
 }
 
 export class GrapheneServer
@@ -51,6 +57,8 @@ export class GrapheneServer
     public apollo: ApolloServer;
     public express: Express;
     public orm: Connection;
+
+    public clientConfig: GrapheneConfig;
 
     private constructor(){}
 
@@ -73,7 +81,7 @@ export class GrapheneServer
         const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [User, DemoPage, ...(opts?.entities ?? [])],
+            entities: [User, ...(opts?.demoMode ? [DemoPage] : []), ...(opts?.entities ?? [])],
             synchronize: true
         }, opts?.connection);
 
@@ -98,23 +106,23 @@ export class GrapheneServer
                 } else if (req.query?.token) {
                     return req.query.token;
                 } else if (req.cookies?.token) {
-                    return req.cookies.token;
+                    return req.cookies.token; 
                 }
                 return null;
             }
         }));
  
-        
+        server.clientConfig = new GrapheneConfig(opts?.inputRenderers ?? {}, opts?.cellRenderers ?? {})
  
         server.logger.verbose("Setting up api");
         server.schema = await buildSchema({
-            resolvers: [UserResolver, DemoPageResolver, ...(opts?.resolvers ?? [])],
+            resolvers: [UserResolver, ...(opts?.demoMode ? [DemoPageResolver] : []), GrapheneConfigResolver, ...(opts?.resolvers ?? [])],
             emitSchemaFile: false,
             authChecker: UserService.AuthChecker,
             container: Container
         });
 
-        server.apollo = new ApolloServer({
+        server.apollo = new ApolloServer({ 
             schema: server.schema,
             validationRules: [depthLimit(7)],
             context: ({req, res}) => {
@@ -129,7 +137,7 @@ export class GrapheneServer
         server.express.use(express.static(www));
         server.express.use((req, res) => {
             readFile(indexHtml, (err, data) => {
-                res.send(data.toString());
+                res.send(data.toString().replace("<!--CUSTOM_HEAD-->", opts?.customHead ?? ""));
             });
         });
 

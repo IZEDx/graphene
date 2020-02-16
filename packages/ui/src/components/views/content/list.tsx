@@ -114,7 +114,7 @@ export class ContentList
                         <p class="subtitle is-5">{ this.listDef.description }</p>
                     </div>
                 </div>
-                <div class="level-right list-controls">
+                <div class="level-right list-controls"> 
                     <div class="level-item">
                         <input 
                             class="input"
@@ -126,7 +126,7 @@ export class ContentList
                     <div class="level-item">
                         { !this.definition.createMutation ? "" : 
                             <button class="button is-success" onClick={() => this.history.push(`/${this.listDef.name}/new`, {})}>
-                                New &nbsp; <ion-icon name="add-circle-outline"></ion-icon>
+                                New &nbsp; <ion-icon name="add-outline"></ion-icon>
                             </button> 
                         }
                     </div>

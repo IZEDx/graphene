@@ -48,7 +48,8 @@ export class GrapheneNav
             {
                 name: "Single",
                 items: this.graphene.queryObjects
-                .filter(f => f.args.length === 0)                
+                .filter(f => f.args.length === 0)  
+                .filter(f => !!f.editMutation)              
                 .map(({name}) => ({
                     name: pascalCase(name), 
                     url: `/${name}`, 

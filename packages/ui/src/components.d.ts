@@ -46,6 +46,12 @@ export namespace Components {
     'breadcrumbClass': ClassList;
   }
   interface GelForm {}
+  interface GelInputRich {
+    'disabled'?: boolean;
+    'formKey': string;
+    'label'?: string;
+    'value'?: string;
+  }
   interface GelInputSelect {
     'disabled'?: boolean;
     'formKey': string;
@@ -149,6 +155,12 @@ declare global {
     new (): HTMLGelFormElement;
   };
 
+  interface HTMLGelInputRichElement extends Components.GelInputRich, HTMLStencilElement {}
+  var HTMLGelInputRichElement: {
+    prototype: HTMLGelInputRichElement;
+    new (): HTMLGelInputRichElement;
+  };
+
   interface HTMLGelInputSelectElement extends Components.GelInputSelect, HTMLStencilElement {}
   var HTMLGelInputSelectElement: {
     prototype: HTMLGelInputSelectElement;
@@ -245,6 +257,7 @@ declare global {
     'content-list': HTMLContentListElement;
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
     'gel-form': HTMLGelFormElement;
+    'gel-input-rich': HTMLGelInputRichElement;
     'gel-input-select': HTMLGelInputSelectElement;
     'gel-input-switch': HTMLGelInputSwitchElement;
     'gel-input-text': HTMLGelInputTextElement;
@@ -286,6 +299,13 @@ declare namespace LocalJSX {
     'breadcrumbClass'?: ClassList;
   }
   interface GelForm {}
+  interface GelInputRich {
+    'disabled'?: boolean;
+    'formKey'?: string;
+    'label'?: string;
+    'onInputUpdate'?: (event: CustomEvent<{formKey: string, value: any}>) => void;
+    'value'?: string;
+  }
   interface GelInputSelect {
     'disabled'?: boolean;
     'formKey'?: string;
@@ -379,6 +399,7 @@ declare namespace LocalJSX {
     'content-list': ContentList;
     'gel-breadcrumbs': GelBreadcrumbs;
     'gel-form': GelForm;
+    'gel-input-rich': GelInputRich;
     'gel-input-select': GelInputSelect;
     'gel-input-switch': GelInputSwitch;
     'gel-input-text': GelInputText;
@@ -409,6 +430,7 @@ declare module "@stencil/core" {
       'content-list': LocalJSX.ContentList & JSXBase.HTMLAttributes<HTMLContentListElement>;
       'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;
       'gel-form': LocalJSX.GelForm & JSXBase.HTMLAttributes<HTMLGelFormElement>;
+      'gel-input-rich': LocalJSX.GelInputRich & JSXBase.HTMLAttributes<HTMLGelInputRichElement>;
       'gel-input-select': LocalJSX.GelInputSelect & JSXBase.HTMLAttributes<HTMLGelInputSelectElement>;
       'gel-input-switch': LocalJSX.GelInputSwitch & JSXBase.HTMLAttributes<HTMLGelInputSwitchElement>;
       'gel-input-text': LocalJSX.GelInputText & JSXBase.HTMLAttributes<HTMLGelInputTextElement>;

@@ -1998,6 +1998,12 @@
   version "1.5.1"
   resolved "https://registry.yarnpkg.com/@types/http-assert/-/http-assert-1.5.1.tgz#d775e93630c2469c2f980fc27e3143240335db3b"
 
+"@types/jquery@*":
+  version "3.3.32"
+  resolved "https://registry.yarnpkg.com/@types/jquery/-/jquery-3.3.32.tgz#93e27fdc45dd38ee07f2f0acf34b59c1ccee036f"
+  dependencies:
+    "@types/sizzle" "*"
+
 "@types/jsonwebtoken@^8.3.7":
   version "8.3.7"
   resolved "https://registry.yarnpkg.com/@types/jsonwebtoken/-/jsonwebtoken-8.3.7.tgz#ab79ad55b9435834d24cca3112f42c08eedb1a54"
@@ -2084,11 +2090,21 @@
     "@types/express-serve-static-core" "*"
     "@types/mime" "*"
 
+"@types/sizzle@*":
+  version "2.3.2"
+  resolved "https://registry.yarnpkg.com/@types/sizzle/-/sizzle-2.3.2.tgz#a811b8c18e2babab7d542b3365887ae2e4d9de47"
+
 "@types/sqlite3@^3.1.6":
   version "3.1.6"
   resolved "https://registry.yarnpkg.com/@types/sqlite3/-/sqlite3-3.1.6.tgz#554ce76f886eb187cfc86e2f0bb67cbac4f568ce"
   dependencies:
     "@types/node" "*"
+
+"@types/tinymce@^4.5.23":
+  version "4.5.23"
+  resolved "https://registry.yarnpkg.com/@types/tinymce/-/tinymce-4.5.23.tgz#26a490ed982f246f60b1265e0fdb0cdfea332f33"
+  dependencies:
+    "@types/jquery" "*"
 
 "@types/validator@10.11.3":
   version "10.11.3"
@@ -3347,6 +3363,16 @@ coa@^2.0.2:
 code-point-at@^1.0.0:
   version "1.1.0"
   resolved "https://registry.yarnpkg.com/code-point-at/-/code-point-at-1.1.0.tgz#0d070b4d043a5bea33a2f1a40e2edb3d9a4ccf77"
+
+codemirror-spell-checker@^1.1.2:
+  version "1.1.2"
+  resolved "https://registry.yarnpkg.com/codemirror-spell-checker/-/codemirror-spell-checker-1.1.2.tgz#1c660f9089483ccb5113b9ba9ca19c3f4993371e"
+  dependencies:
+    typo-js "*"
+
+codemirror@^5.33.0:
+  version "5.51.0"
+  resolved "https://registry.yarnpkg.com/codemirror/-/codemirror-5.51.0.tgz#7746caaf5223e68f5c55ea11e2f3cc82a9a3929e"
 
 collection-visit@^1.0.0:
   version "1.0.0"
@@ -5463,6 +5489,14 @@ inquirer@^6.2.0:
     strip-ansi "^5.1.0"
     through "^2.3.6"
 
+inscrybmde@^1.11.6:
+  version "1.11.6"
+  resolved "https://registry.yarnpkg.com/inscrybmde/-/inscrybmde-1.11.6.tgz#4c27a99edb05cce486e6816d8ff771f9a5b95950"
+  dependencies:
+    codemirror "^5.33.0"
+    codemirror-spell-checker "^1.1.2"
+    marked "^0.5.1"
+
 invariant@^2.2.2, invariant@^2.2.4:
   version "2.2.4"
   resolved "https://registry.yarnpkg.com/invariant/-/invariant-2.2.4.tgz#610f3c92c9359ce1db616e538008d23ff35158e6"
@@ -6261,6 +6295,10 @@ map-visit@^1.0.0:
   resolved "https://registry.yarnpkg.com/map-visit/-/map-visit-1.0.0.tgz#ecdca8f13144e660f1b5bd41f12f3479d98dfb8f"
   dependencies:
     object-visit "^1.0.0"
+
+marked@^0.5.1:
+  version "0.5.2"
+  resolved "https://registry.yarnpkg.com/marked/-/marked-0.5.2.tgz#3efdb27b1fd0ecec4f5aba362bddcd18120e5ba9"
 
 md5.js@^1.3.4:
   version "1.3.5"
@@ -9030,6 +9068,10 @@ tiny-inflate@^1.0.0:
   version "1.0.3"
   resolved "https://registry.yarnpkg.com/tiny-inflate/-/tiny-inflate-1.0.3.tgz#122715494913a1805166aaf7c93467933eea26c4"
 
+tinymce@^5.2.0:
+  version "5.2.0"
+  resolved "https://registry.yarnpkg.com/tinymce/-/tinymce-5.2.0.tgz#e838640f61c8a936317bc27a5d2e16c297df3418"
+
 tmp@^0.0.33:
   version "0.0.33"
   resolved "https://registry.yarnpkg.com/tmp/-/tmp-0.0.33.tgz#6d34335889768d21b2bcda0aa277ced3b1bfadf9"
@@ -9225,6 +9267,10 @@ typesync@latest:
     glob "^7.1.4"
     ora "^3.4.0"
     semver "^6.3.0"
+
+typo-js@*:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/typo-js/-/typo-js-1.1.0.tgz#a5a9f592bcb453666bf70c9694da58705d025ed8"
 
 ua-parser-js@^0.7.18:
   version "0.7.21"

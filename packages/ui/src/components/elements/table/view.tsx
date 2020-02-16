@@ -68,8 +68,8 @@ export class GELTable
                 "is-active": this.sortBy === col
             }}>
             { this.order === "ASC"
-                ? <ion-icon name="arrow-dropup"></ion-icon>
-                : <ion-icon name="arrow-dropdown"></ion-icon>
+                ? <ion-icon name="caret-up-outline"></ion-icon>
+                : <ion-icon name="caret-down-outline"></ion-icon>
             }
             </span>
         </div>

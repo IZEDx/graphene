@@ -27,11 +27,10 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
         {
             case "DateTime": return new Date(val).toLocaleString();
             case "Boolean": return val === "true" ? <ion-icon name="checkbox-outline"></ion-icon> : <ion-icon name="square-outline"></ion-icon>;
-            case "ID": return ""+val;
-            case "String": return ""+val;
             default: 
                 const renderer = this.graphene.cellRenderers[this.type.name];
                 if (renderer) return renderer(val);
+                else if (typeof val === "string" && val.length > 32) return ""+val.substr(0, 32)+"...";
                 else return ""+val;
         }
     }

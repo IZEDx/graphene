@@ -2,7 +2,6 @@ import { Service, Inject } from "typedi";
 import { GrapheneServer } from "../server";
 import { ColorfulChalkLogger } from "colorful-chalk-logger";
 import DemoPage from "../models/DemoPage";
-import { HTMLPageContent, MarkdownPageContent } from "../models/unions/PageContentUnion";
 import { CreatePageInput, EditPageInput } from "../resolvers/demoPage/DemoPageResolver";
 import User from "../models/User";
 
@@ -26,7 +25,13 @@ export class DemoPageService
 
     create(data: CreatePageInput, user: User)
     {
+
         const page = DemoPage.create({
+            ...data, 
+            author: user
+        });
+
+        console.log({
             ...data, 
             author: user
         });
