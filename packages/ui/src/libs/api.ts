@@ -16,7 +16,6 @@ export class API<Responses extends Record<string, any>, Queries extends Record<k
             Authorization: `Bearer ${token}`,
         };
 
-        console.log(typeof token, headers);
         this.client = new GraphQLClient(this.url, {headers})
     }
 

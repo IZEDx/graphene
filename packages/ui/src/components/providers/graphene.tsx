@@ -96,37 +96,48 @@ export class GrapheneProvider
     @graphene.Observe("token")
     async connectToAPI(token?: string)
     {
+        console.log("Connecting...", token);
+
         this.isConnected = false;
         this.toggleBackground.emit(false);
 
         if (token) localStorage.setItem("token", token);
         else localStorage.removeItem("token");
 
-        let graphene = this.graphene;
         if (!this.api)
         {
             this.api = new API(this.endPoint, APIQueries, token);
-            graphene = new Graphene(this.api, {}, {});
+            this.graphene = new Graphene(this.api, {}, {});
         }
         else
         {
             this.api.setToken(token);
         }
 
-        
+        try
+        {
+            await this.graphene.load();
+        } catch(e) {
+            if (e?.response?.status === 401 && token)
+            {
+                this._token = undefined;
+                return;
+            }
+        }
 
-        await graphene.load();
-        this.graphene = graphene;
+        this.graphene = this.graphene; 
 
         try
         {
             const meField = this.graphene.getQuery("me");
+            console.log(meField);
             const me = (await meField?.request())[meField?.name];
             if (me) this.isAuthorized = true;
             else this.isAuthorized = false;
         } 
         catch(err)
         {
+            console.log(err)
             this.isAuthorized = false;
         }
 
