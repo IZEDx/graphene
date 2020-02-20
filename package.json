@@ -9,8 +9,7 @@
     "dev:api": "cd ./packages/api && npm run dev",
     "dev:ui": "cd ./packages/ui && npm run dev",
     "test": "npx lerna run test",
-    "start": "node bin/graphene-cms.js",
-    "start:dev": "nodemon --watch packages/api/dist bin/graphene-cms.js",
+    "start": "nodemon --watch packages/api/dist bin/graphene-cms.js",
     "typesync": "npx typesync"
   },
   "dependencies": {
