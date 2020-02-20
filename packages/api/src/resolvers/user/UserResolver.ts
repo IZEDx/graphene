@@ -81,7 +81,7 @@ export default class UserResolver //implements ResolverInterface<User>
         const user = await User.findOne({ where: { name: data.name } });
         if (!user || !await this.userService.checkPassword(user, data.password)) throw new Error("Credentials invalid");
 
-        return this.userService.authorize(user, context, 1);
+        return this.userService.authorize(user, context);
     }
 
     @Authorized("USER", "ADMIN")

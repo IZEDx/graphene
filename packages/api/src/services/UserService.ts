@@ -23,15 +23,15 @@ export class UserService
         if (!context.user.id) return false;
 
         const user = await User.findOne(context.user.id);
-        console.log(user, roles);
         if (user) {
             return roles.length === 0 || roles.includes(user.role);
         }
         return false; 
     }
 
-    authorize(user: User, ctx: GrapheneContext, expiresInDays = 1) 
+    authorize(user: User, ctx: GrapheneContext) 
     {
+        const expiresInDays = this.server.options.authExpire ?? 1;
         const token = jwt.sign({ id: user.id }, this.server.options.secret ?? "Graphene", {
             expiresIn: expiresInDays + "d",
         }) as string;

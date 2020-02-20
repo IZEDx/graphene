@@ -17,8 +17,6 @@ import cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { UserService } from './services/UserService';
 import { ColorfulChalkLogger, DEBUG } from "colorful-chalk-logger";
-import DemoPage from './models/DemoPage';
-import DemoPageResolver from './resolvers/demoPage/DemoPageResolver';
 import GrapheneConfig from './models/GrapheneConfig';
 import GrapheneConfigResolver from './resolvers/grapheneConfig/GrapheneConfigResolver';
 
@@ -47,6 +45,7 @@ export interface GrapheneOptions
     inputRenderers?: Record<string, string>;
     cellRenderers?: Record<string, string>;
     demoMode?: boolean;
+    authExpire?: number; // in days
 }
 
 export class GrapheneServer
@@ -78,10 +77,15 @@ export class GrapheneServer
 
         Container.set("logger", server.logger);
 
+        if (opts?.demoMode)
+        {
+            server.logger.info("Running in demo mode")
+        }
+
         const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [User, ...(opts?.demoMode ? [DemoPage] : []), ...(opts?.entities ?? [])],
+            entities: [User, ...(opts?.demoMode ? [await import('./models/DemoPage')] : []), ...(opts?.entities ?? [])],
             synchronize: true
         }, opts?.connection);
 
@@ -106,7 +110,7 @@ export class GrapheneServer
                 } else if (req.query?.token) {
                     return req.query.token;
                 } else if (req.cookies?.token) {
-                    return req.cookies.token; 
+                    return req.cookies.token;  
                 }
                 return null;
             }
@@ -114,10 +118,12 @@ export class GrapheneServer
  
         server.clientConfig = new GrapheneConfig(opts?.inputRenderers ?? {}, opts?.cellRenderers ?? {})
  
-        server.logger.verbose("Setting up api");
+        server.logger.verbose("Setting up graphql");
+
+        const resolvers = [UserResolver, ...(opts?.demoMode ? [await import('./resolvers/demoPage/DemoPageResolver')] : []), GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
         server.schema = await buildSchema({
-            resolvers: [UserResolver, ...(opts?.demoMode ? [DemoPageResolver] : []), GrapheneConfigResolver, ...(opts?.resolvers ?? [])],
-            emitSchemaFile: false,
+            resolvers: resolvers as any,
+            emitSchemaFile: true,
             authChecker: UserService.AuthChecker,
             container: Container
         });
