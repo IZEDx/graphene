@@ -18,6 +18,9 @@ export class ContentView
     @Event() clearBreadcrumb: EventEmitter<void>;
 
     @Prop() match: MatchResults;
+    @Prop() isCreate?: boolean;
+    @Prop() isDelete?: boolean;
+    @Prop() isEdit?: boolean;
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
@@ -74,26 +77,43 @@ export class ContentView
             <segment class="segment">
                 <div class="container">
                     <div class="box has-blur-background">
-                        {
-                            ! this.definition
-                            ? <h1>404</h1>
-                            : this.id === "new" && this.isList
-                            ? <content-create></content-create>
-                            : !!this.id || !this.isList
-                            ? <content-edit 
-                                params={this.id ? {id: this.id} : undefined}
-                                preferredColumns={preferredColumns} 
-                                readonlyColumns={readOnlyColumns}
-                            ></content-edit>
-                            : <content-list 
-                                definition={this.definition}
-                                preferredColumns={preferredColumns} 
-                                preferredEndColumns={preferredEndColumns}
-                            ></content-list>
-                        }
+                        { this.renderView() }
                     </div>
                 </div>
             </segment>
         </util-guard>;
+    }
+
+    renderView()
+    {
+        if (!this.definition) return (
+            <h1>404</h1>
+        );
+
+        if (this.isCreate && this.isList) return (
+            <content-create></content-create>
+        );
+
+        if (this.isDelete) return (
+            <content-delete 
+                params={this.id ? {id: this.id} : undefined}
+            ></content-delete>
+        );
+
+        if (this.isEdit && !this.isList) return (
+            <content-edit 
+                params={this.id ? {id: this.id} : undefined}
+                preferredColumns={preferredColumns} 
+                readonlyColumns={readOnlyColumns}
+            ></content-edit>
+        );
+
+        return (
+            <content-list 
+                definition={this.definition}
+                preferredColumns={preferredColumns} 
+                preferredEndColumns={preferredEndColumns}
+            ></content-list>
+        );
     }
 }

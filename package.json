@@ -12,9 +12,6 @@
     "start": "nodemon --watch packages/api/dist bin/graphene-cms.js",
     "typesync": "npx typesync"
   },
-  "dependencies": {
-    "sqlite3": "^4.1.1"
-  },
   "devDependencies": {
     "@graphql-codegen/visitor-plugin-common": "^1.12.2",
     "@stencil/core": "latest",
@@ -71,7 +68,28 @@
     "typesync": "latest"
   },
   "peerDependencies": {
+    "mssql": "^6.1.0",
+    "mysql": "^2.18.1",
+    "pg": "^7.18.2",
+    "sql.js": "^1.1.0",
     "sqlite3": "^4.1.1"
+  },
+  "peerDependenciesMeta": {
+    "mssql": {
+      "optional": true
+    },
+    "mysql": {
+      "optional": true
+    },
+    "pg": {
+      "optional": true
+    },
+    "sql.js": {
+      "optional": true
+    },
+    "sqlite3": {
+      "optional": true
+    }
   },
   "resolutions": {
     "class-validator": "0.11.0"

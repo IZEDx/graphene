@@ -28,6 +28,10 @@ import {
 export namespace Components {
   interface BreadcrumbProvider {}
   interface ContentCreate {}
+  interface ContentDelete {
+    'history': RouterHistory;
+    'params': Record<string, string|number>|undefined;
+  }
   interface ContentEdit {
     'history': RouterHistory;
     'params': Record<string, string|number>|undefined;
@@ -109,6 +113,9 @@ export namespace Components {
     'props': RouteRenderProps | undefined;
   }
   interface ViewContent {
+    'isCreate'?: boolean;
+    'isDelete'?: boolean;
+    'isEdit'?: boolean;
     'match': MatchResults;
   }
   interface ViewDashboard {}
@@ -129,6 +136,12 @@ declare global {
   var HTMLContentCreateElement: {
     prototype: HTMLContentCreateElement;
     new (): HTMLContentCreateElement;
+  };
+
+  interface HTMLContentDeleteElement extends Components.ContentDelete, HTMLStencilElement {}
+  var HTMLContentDeleteElement: {
+    prototype: HTMLContentDeleteElement;
+    new (): HTMLContentDeleteElement;
   };
 
   interface HTMLContentEditElement extends Components.ContentEdit, HTMLStencilElement {}
@@ -253,6 +266,7 @@ declare global {
   interface HTMLElementTagNameMap {
     'breadcrumb-provider': HTMLBreadcrumbProviderElement;
     'content-create': HTMLContentCreateElement;
+    'content-delete': HTMLContentDeleteElement;
     'content-edit': HTMLContentEditElement;
     'content-list': HTMLContentListElement;
     'gel-breadcrumbs': HTMLGelBreadcrumbsElement;
@@ -279,6 +293,12 @@ declare global {
 declare namespace LocalJSX {
   interface BreadcrumbProvider {}
   interface ContentCreate {}
+  interface ContentDelete {
+    'history'?: RouterHistory;
+    'onApiError'?: (event: CustomEvent<any>) => void;
+    'onSuccessToast'?: (event: CustomEvent<string>) => void;
+    'params'?: Record<string, string|number>|undefined;
+  }
   interface ContentEdit {
     'history'?: RouterHistory;
     'onApiError'?: (event: CustomEvent<any>) => void;
@@ -374,6 +394,9 @@ declare namespace LocalJSX {
     'props'?: RouteRenderProps | undefined;
   }
   interface ViewContent {
+    'isCreate'?: boolean;
+    'isDelete'?: boolean;
+    'isEdit'?: boolean;
     'match'?: MatchResults;
     'onClearBreadcrumb'?: (event: CustomEvent<void>) => void;
     'onPushBreadcrumb'?: (event: CustomEvent<[string, string]>) => void;
@@ -395,6 +418,7 @@ declare namespace LocalJSX {
   interface IntrinsicElements {
     'breadcrumb-provider': BreadcrumbProvider;
     'content-create': ContentCreate;
+    'content-delete': ContentDelete;
     'content-edit': ContentEdit;
     'content-list': ContentList;
     'gel-breadcrumbs': GelBreadcrumbs;
@@ -426,6 +450,7 @@ declare module "@stencil/core" {
     interface IntrinsicElements {
       'breadcrumb-provider': LocalJSX.BreadcrumbProvider & JSXBase.HTMLAttributes<HTMLBreadcrumbProviderElement>;
       'content-create': LocalJSX.ContentCreate & JSXBase.HTMLAttributes<HTMLContentCreateElement>;
+      'content-delete': LocalJSX.ContentDelete & JSXBase.HTMLAttributes<HTMLContentDeleteElement>;
       'content-edit': LocalJSX.ContentEdit & JSXBase.HTMLAttributes<HTMLContentEditElement>;
       'content-list': LocalJSX.ContentList & JSXBase.HTMLAttributes<HTMLContentListElement>;
       'gel-breadcrumbs': LocalJSX.GelBreadcrumbs & JSXBase.HTMLAttributes<HTMLGelBreadcrumbsElement>;

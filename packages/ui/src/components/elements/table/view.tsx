@@ -75,11 +75,11 @@ export class GELTable
         </div>
     )
 
-    goto = (row: any) => () =>
+    goto = (row: any, del?: boolean) => () =>
     {
         const link = this.linkTo?.(row);
         console.log(link);
-        if (link) this.history.push(link, {});
+        if (link) this.history.push(link + (del ? "/delete" : ""), {});
     }
 
     onClick={}
@@ -95,7 +95,7 @@ export class GELTable
                 <ion-icon name="create"></ion-icon>
             </button>
             <div class="gap"></div>
-            <button class="button is-small is-danger">
+            <button class="button is-small is-danger" onClick={this.goto(row, true)}>
                 <ion-icon name="trash"></ion-icon>
             </button>
         </div>
