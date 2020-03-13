@@ -94,5 +94,20 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         return this.graphene.api.client.request<T>(query);
     }
 
+    async delete<R = T>(id: string|number)
+    {
+        if (!this.deleteMutation) return;
+
+        const args = this.deleteMutation.args;
+        console.log("delete args", args);
+
+        const query = `mutation {
+            ${this.deleteMutation.name}(id: "${id}") ${this.type.toQuery()}
+        }`;
+        
+        console.log(query);
+        return this.graphene.api.client.request<R>(query);
+    }
+
     //TODO: Delete
 }
