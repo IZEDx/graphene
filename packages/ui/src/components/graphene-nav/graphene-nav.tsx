@@ -1,7 +1,7 @@
 import { Component, h, State } from '@stencil/core';
 import { graphene, nav } from '../../global/context';
 import { Category } from '../elements/menu/model';
-import { pascalCase } from "change-case";
+import { capitalCase } from "change-case";
 import { mergeClass } from '../../libs/utils';
 import { Graphene } from '../../libs/graphene';
 
@@ -51,7 +51,7 @@ export class GrapheneNav
                 .filter(f => f.args.length === 0)  
                 .filter(f => !!f.editMutation)              
                 .map(({name}) => ({
-                    name: pascalCase(name), 
+                    name: capitalCase(name), 
                     url: `/${name}`, 
                     children: [], 
                     exact: false
@@ -60,7 +60,7 @@ export class GrapheneNav
             {
                 name: "Content",
                 items: this.graphene.queryLists.map(({name}) => ({
-                    name: pascalCase(name), 
+                    name: capitalCase(name), 
                     url: `/${name}`, 
                     children: [], 
                     exact: false
