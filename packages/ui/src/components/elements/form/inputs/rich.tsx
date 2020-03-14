@@ -41,16 +41,17 @@ export class GELInputRich
             },
             toolbar: 'undo redo | styleselect | bold italic | alignleft aligncenter alignright alignjustify | outdent indent | code',
         } as any)
+
+        this.inputUpdate.emit({
+            formKey: this.formKey,
+            value: escape(this._value)
+        });
     }
 
     updateContent(newVal: string)
     { 
         if (this.disabled) return;
         this._value = newVal;
-        this.inputUpdate.emit({
-            formKey: this.formKey,
-            value: escape(this._value)
-        });
     }
  
     render()

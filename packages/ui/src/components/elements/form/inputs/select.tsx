@@ -19,7 +19,15 @@ export class GELInputSelect
 
     selectEl: HTMLSelectElement;
 
-    updateContent(_e: Event)
+    componentDidLoad()
+    {
+        this.inputUpdate.emit({
+            formKey: this.formKey,
+            value: this.selectEl.value
+        });
+    }
+
+    updateContent(_e?: Event)
     {
         this.inputUpdate.emit({
             formKey: this.formKey,

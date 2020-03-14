@@ -20,6 +20,14 @@ export class GELInputText
 
     inputEl: HTMLInputElement;
 
+    componentDidLoad()
+    {
+        this.inputUpdate.emit({
+            formKey: this.formKey,
+            value: this.inputEl.value
+        });
+    }
+
     updateContent(_e: KeyboardEvent)
     {
         this.inputUpdate.emit({

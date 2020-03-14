@@ -25,6 +25,14 @@ export class GELInputSwitch
         this._value = this.value;
     }
 
+    componentDidLoad()
+    {
+        this.inputUpdate.emit({
+            formKey: this.formKey,
+            value: this._value
+        });
+    }
+
     updateContent(newVal: boolean)
     {
         if (this.disabled) return;
