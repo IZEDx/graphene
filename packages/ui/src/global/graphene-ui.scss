@@ -17,4 +17,7 @@
 @import "../../../../node_modules/bulma-pageloader/dist/css/bulma-pageloader.sass";
 @import "overrides";
 
-                                        
+.pageloader.stop::after
+{
+  animation: none;
+}

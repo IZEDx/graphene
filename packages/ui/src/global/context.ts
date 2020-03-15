@@ -7,6 +7,7 @@ export const graphene = new Entanglement({
     api: qt<GrapheneAPI>(),
     graphene: qt<Graphene>(),
     connected: qt<boolean>({default: false}),
+    apiDown: qt<boolean>({default: false}),
     isAuthorized: qt<boolean>({default: false}),
     token: qt<string|undefined>()
 });

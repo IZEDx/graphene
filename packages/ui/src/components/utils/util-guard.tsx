@@ -9,6 +9,7 @@ import { graphene } from "../../global/context";
 export class UtilGuard 
 {
     @graphene.Context("connected") isConnected: boolean;
+    @graphene.Context("apiDown") apiDown: boolean;
     @graphene.Context("isAuthorized") isAuthorized: boolean;
 
     render()
@@ -16,9 +17,10 @@ export class UtilGuard
         return <Host>
             <div class={{
                 "pageloader": true,
-                "is-active": !this.isConnected
+                "is-active": !this.isConnected,
+                "stop": this.apiDown
             }}>
-                <span class="title">Graphene</span>
+                <span class="title">{this.apiDown ? "Can't connect!" : "Graphene"}</span>
             </div>
             {this.isAuthorized ? "" : <view-login></view-login>}
             <div style={this.isConnected && this.isAuthorized ? {} : {display: "none"}}>

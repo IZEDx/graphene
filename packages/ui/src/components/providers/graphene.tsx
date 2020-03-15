@@ -18,6 +18,7 @@ export class GrapheneProvider
     @graphene.Provide("connected") isConnected = false;
     @graphene.Provide("token") _token: string;
     @graphene.Provide("isAuthorized") isAuthorized = false;
+    @graphene.Provide("apiDown") apiDown = false;
 
     @Prop() endPoint: string;
     @Prop() token?: string;
@@ -123,17 +124,29 @@ export class GrapheneProvider
                 this._token = undefined;
                 return;
             }
+            else
+            {
+                console.error("Could not connect to api.");
+                this.apiDown = true;
+            }
         }
-
-        this.graphene = this.graphene; 
 
         try
         {
             const meField = this.graphene.getQuery("me");
-            console.log(meField);
-            const me = (await meField?.request())[meField?.name];
-            if (me) this.isAuthorized = true;
-            else this.isAuthorized = false;
+
+            if (!meField) 
+            {
+                this.isConnected = false;
+                this.isAuthorized = false;
+            }
+            else
+            {
+                this.isConnected = true;
+                const me = (await meField?.request())[meField?.name];
+                if (me) this.isAuthorized = true;
+                else this.isAuthorized = false;
+            }
         } 
         catch(err)
         {
@@ -141,7 +154,7 @@ export class GrapheneProvider
             this.isAuthorized = false;
         }
 
-        this.isConnected = true;
+        this.graphene = this.graphene; 
         this.toggleBackground.emit(true);
     }
 
