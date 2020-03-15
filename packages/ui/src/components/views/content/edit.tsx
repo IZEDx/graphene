@@ -4,6 +4,7 @@ import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneListType, GrapheneInputObjectType } from "../../../libs/graphene";
 import { capitalCase } from "change-case";
 import { RouterHistory, injectHistory } from "@stencil/router";
+import { GraphQLErrorMessage } from "../../../libs/utils";
 
 @Component({
     tag: 'content-edit',
@@ -32,6 +33,7 @@ export class ContentEdit
     @State() failed = false;
     @State() isSaving = false;
     @State() isDeleting = false;
+    @State() error: Error;
 
     fieldMap: Record<string, GrapheneField>;
     editType: GrapheneInputObjectType;
@@ -77,7 +79,8 @@ export class ContentEdit
         }
         catch(e)
         {
-            this.apiError.emit(e);
+            console.error(e);
+            this.error = e;
             this.failed = true;
         }
         
@@ -130,7 +133,7 @@ export class ContentEdit
 
         console.log("readonly", this.readonlyColumns, this.definition.type);
 
-        return this.failed ? "Something went wrong" : [
+        return this.failed ? GraphQLErrorMessage(this.error) : [
             <div class="level is-mobile">
                 <div class="level-left">
                     { !this.isList ? "" :

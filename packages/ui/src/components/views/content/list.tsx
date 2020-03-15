@@ -5,6 +5,7 @@ import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
 import { GraphQLOutputType } from "graphql";
 import { injectHistory, RouterHistory } from "@stencil/router";
+import { GraphQLErrorMessage } from "../../../libs/utils";
 
 @Component({
     tag: 'content-list'
@@ -30,6 +31,7 @@ export class ContentList
     @State() rows: any[] = [];
     @State() values: any[] = [];
     @State() failed = false;
+    @State() error: Error;
 
     fieldMap: Record<string, GrapheneField<GrapheneType<GraphQLOutputType>>>;
 
@@ -70,6 +72,7 @@ export class ContentList
         catch(e)
         {
             console.error(e);
+            this.error = e;
             this.failed = true;
         }
     }
@@ -104,7 +107,7 @@ export class ContentList
     render()
     {
         if (!this.listDef) return "";
-        return this.failed ? "Something went wrong" : [
+        return this.failed ? GraphQLErrorMessage(this.error) : [
             <div class="level is-mobile">
                 <div class="level-left">
                     <div class="level-item content">

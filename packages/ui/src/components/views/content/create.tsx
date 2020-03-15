@@ -4,6 +4,7 @@ import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType, GrapheneInputObjectType, GrapheneListType } from "../../../libs/graphene";
 import { capitalCase } from "change-case";
 import { RouterHistory, injectHistory } from "@stencil/router";
+import { GraphQLErrorMessage } from "../../../libs/utils";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const readOnlyColumns = ["id", "created_at", "updated_at"];
@@ -29,6 +30,7 @@ export class ContentCreate
     @State() entries: [string, any][] = [];
     @State() failed = false;
     @State() isCreating = false;
+    @State() error: Error;
 
     fieldMap: Record<string, GrapheneField>;
 
@@ -65,6 +67,8 @@ export class ContentCreate
         }
         catch(e)
         {
+            console.error(e);
+            this.error = e;
             this.failed = true;
         }
         
@@ -99,7 +103,7 @@ export class ContentCreate
     render() 
     {
 
-        return this.failed ? "Something went wrong" : [
+        return this.failed ? GraphQLErrorMessage(this.error) : [
             <div class="level is-mobile">
                 <div class="level-left">
                     <div class="level-item">
