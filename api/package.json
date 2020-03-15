@@ -4,7 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "parcel build src/index.ts --out-dir dist --target node",
+    "build": "parcel build src/index.ts --out-dir dist --target node --no-minify",
     "dev": "parcel watch src/index.ts --out-dir dist --target node"
   }
 }
