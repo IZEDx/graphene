@@ -17,6 +17,9 @@ export class GELTable
 
     render()
     {
+        if (this.columns === undefined) return "Loading...";
+        if (this.columns.length === 0) return "There is nothing here!";
+
         if (!this.columns.includes(this.sortBy)) this.sortBy = this.columns[0];
         if (!this.sortBy || this.order !== "ASC" && this.order !== "DESC") return "WTF";
 
