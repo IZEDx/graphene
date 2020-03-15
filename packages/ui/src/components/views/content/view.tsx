@@ -100,7 +100,7 @@ export class ContentView
             ></content-delete>
         );
 
-        if (this.isEdit && !this.isList) return (
+        if (this.isEdit) return (
             <content-edit 
                 params={this.id ? {id: this.id} : undefined}
                 preferredColumns={preferredColumns} 
