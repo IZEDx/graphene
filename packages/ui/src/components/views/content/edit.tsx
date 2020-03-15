@@ -36,6 +36,11 @@ export class ContentEdit
     fieldMap: Record<string, GrapheneField>;
     editType: GrapheneInputObjectType;
 
+    get entryMap()
+    {
+        return this.entries?.reduce((a, [k,v]) => ({...a, [k]: v})) ?? {};
+    }
+
     @content.Observe("definition")
     async componentWillLoad()
     {
@@ -91,7 +96,7 @@ export class ContentEdit
         try
         {
             this.isSaving = true;
-            const result = await this.definition.edit<{id: string}>(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
+            const result = await this.definition.edit<{id: string}>(this.entryMap);
             this.successToast.emit("Save successful");
             this.history.push(`/${this.listDef.name}/${result.id}`);
         }
@@ -100,6 +105,11 @@ export class ContentEdit
             this.apiError.emit(e);
         } 
         this.isSaving = false;
+    }
+
+    async onDelete()
+    {
+        this.history.push(`/${this.listDef.name}/${this.params?.id}/delete`);
     }
 
     get title()
@@ -149,7 +159,7 @@ export class ContentEdit
                                     "is-loading": this.isDeleting
                                 }} 
                                 disabled={this.isDeleting}
-                                onClick={() => {}}
+                                onClick={() => this.onDelete()}
                             >
                                 Delete &nbsp; <ion-icon name="trash"></ion-icon>
                             </button>
@@ -173,7 +183,7 @@ export class ContentEdit
                 </div>
             </div>,
             <gel-form>
-                { this.editType.renderEdit(this.entries.reduce((a, b) => ({...a, [b[0]]: b[1]}), {}), this.readonlyColumns) }
+                { this.editType.renderEdit(this.entryMap, this.readonlyColumns) }
                 {/* this.entries?.map(([key, value]) => {
                     const {type, name} = this.fieldMap[key];
                     return type?.renderEdit({ 
