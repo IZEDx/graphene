@@ -13,6 +13,7 @@ export namespace Components {
     interface BreadcrumbProvider {
     }
     interface ContentCreate {
+        "history": RouterHistory;
     }
     interface ContentDelete {
         "history": RouterHistory;
@@ -287,6 +288,9 @@ declare namespace LocalJSX {
     interface BreadcrumbProvider {
     }
     interface ContentCreate {
+        "history"?: RouterHistory;
+        "onApiError"?: (event: CustomEvent<any>) => void;
+        "onSuccessToast"?: (event: CustomEvent<string>) => void;
     }
     interface ContentDelete {
         "history"?: RouterHistory;

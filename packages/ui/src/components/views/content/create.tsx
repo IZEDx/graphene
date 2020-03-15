@@ -1,8 +1,9 @@
-import { Component, h, State, Listen } from "@stencil/core";
+import { Component, h, State, Listen, Event, Prop, EventEmitter } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType, GrapheneInputObjectType, GrapheneListType } from "../../../libs/graphene";
 import { capitalCase } from "change-case";
+import { RouterHistory, injectHistory } from "@stencil/router";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const readOnlyColumns = ["id", "created_at", "updated_at"];
@@ -13,6 +14,11 @@ const readOnlyColumns = ["id", "created_at", "updated_at"];
 })
 export class ContentCreate 
 {
+    @Event() apiError: EventEmitter<any>;
+    @Event() successToast: EventEmitter<string>;
+
+    @Prop() history: RouterHistory;
+
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
 
@@ -22,6 +28,7 @@ export class ContentCreate
 
     @State() entries: [string, any][] = [];
     @State() failed = false;
+    @State() isCreating = false;
 
     fieldMap: Record<string, GrapheneField>;
 
@@ -74,8 +81,19 @@ export class ContentCreate
 
     async onSave()
     {
-        const result = await this.definition.create(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
-        console.log(result);
+        this.isCreating = true;
+        try
+        {
+            const result = await this.definition.create(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
+            console.log(result);
+            this.successToast.emit("Creation successful");
+            this.history.push(`/${this.listDef.name}`);
+        }
+        catch(e)
+        {
+            this.apiError.emit(e);
+        } 
+        this.isCreating = false;
     }
 
     render() 
@@ -99,7 +117,15 @@ export class ContentCreate
                 </div>
                 <div class="level-right">
                     <div class="level-item">
-                        <button class="button is-success" onClick={() => this.onSave()}>
+                        <button 
+                            class={{
+                                "button": true,
+                                "is-success": true,
+                                "is-loading": this.isCreating
+                            }}
+                            disabled={this.isCreating}
+                            onClick={() => this.onSave()}
+                        >
                             Create &nbsp; <ion-icon name="save"></ion-icon>
                         </button>
                     </div>
@@ -120,3 +146,5 @@ export class ContentCreate
         ]
     }
 }
+
+injectHistory(ContentCreate);
