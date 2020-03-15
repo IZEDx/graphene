@@ -35,7 +35,7 @@ export interface GrapheneContext extends ExpressContext
 export interface GrapheneOptions 
 {
     entities?: EntitySchema<any>[];
-    resolvers?: Function[];
+    resolvers?: (string | Function)[];
     connection?: ConnectionOptions;
     port?: number;
     hostname?: string;
