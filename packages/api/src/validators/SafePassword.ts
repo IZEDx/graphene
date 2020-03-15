@@ -1,4 +1,5 @@
 import {ValidatorConstraint, ValidatorConstraintInterface, ValidationArguments} from "class-validator";
+import { passwordMask } from "../models/scalars/Password";
 
 const letters = "abcdefghijklmnopqrstuvwxyz";
 const digits = "0123456789";
@@ -21,7 +22,7 @@ export class SafePassword implements ValidatorConstraintInterface
         this.digit = digits.split("").find(digit => pw.includes(digit)) !== undefined;
         this.specialChar = specialChars.split("").find(char => pw.includes(char)) !== undefined;
 
-        return this.length && this.lowerCase && this.upperCase && this.digit && this.specialChar;
+        return pw === passwordMask || (this.length && this.lowerCase && this.upperCase && this.digit && this.specialChar);
     }
 
     defaultMessage(args: ValidationArguments) 
