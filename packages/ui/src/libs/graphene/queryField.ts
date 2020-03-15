@@ -102,7 +102,7 @@ export class GrapheneQueryField<T extends GrapheneType<GraphQLOutputType> = Grap
         console.log("delete args", args);
 
         const query = `mutation {
-            ${this.deleteMutation.name}(id: "${id}") ${this.type.toQuery()}
+            ${this.deleteMutation.name}(id: "${id}") ${this.type.toQuery().replace("id", "")}
         }`;
         
         console.log(query);
