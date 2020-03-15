@@ -1,5 +1,12 @@
 {
   "name": "graphene-cms",
+  "version": "0.0.1",
+  "description": "Graphene CMS",
+  "main": "api/dist/index.js",
+  "types": "api/dist",
+  "collection": "ui/dist/collection/collection-manifest.json",
+  "collection:main": "ui/dist/collection/index.js",
+  "unpkg": "ui/dist/graphene-admin/graphene-admin.js",
   "scripts": {
     "build": "npm run build:api & npm run build:ui",
     "build:api": "cd ./api && npm run build",
