@@ -32,6 +32,7 @@
     "jsonwebtoken": "^8.5.1",
     "object-hash": "^2.0.1",
     "reflect-metadata": "^0.1.13",
+    "ssha": "^1.0.1",
     "type-graphql": "^0.17.6",
     "typedi": "^0.8.0",
     "typeorm": "^0.2.22"
