@@ -46,6 +46,7 @@ graph TD;
   view-login --> gel-input-text
   content-create --> stencil-route-link
   content-create --> gel-form
+  content-delete --> stencil-route-link
   content-edit --> stencil-route-link
   content-edit --> gel-form
   content-list --> gel-table

@@ -56,9 +56,20 @@ export class ContentDelete
     {
         console.log("delete", this.params);
         return <Host>
-            <div class="level">
-                <div class="level-item">
-                    <h1>Delete</h1>
+            <div class="level is-mobile">
+                <div class="level-left">
+                    <div class="level-item">
+                        <stencil-route-link url={`/${this.listDef.name}${this.params?.id ? "/"+this.params.id : ""}`}>
+                            <button class="button is-white">
+                                <ion-icon name="chevron-back-outline"></ion-icon>
+                            </button>
+                        </stencil-route-link>
+                    </div>
+                    <div class="level-item">
+                        <p class="subtitle is-5">
+                            <strong>Delete {capitalCase(this.definition.name)}</strong>
+                        </p>
+                    </div>
                 </div>
             </div>
             <div class="level">
