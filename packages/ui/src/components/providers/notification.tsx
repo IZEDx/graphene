@@ -1,5 +1,6 @@
 import { Component, h, Listen } from "@stencil/core";
 import toast from "bulma-toast";
+import { Notification } from "../../global/types";
 
 @Component({
     tag: 'notification-provider'
@@ -7,7 +8,7 @@ import toast from "bulma-toast";
 export class NotificationProvider 
 {
     @Listen("notification")
-    onNotification(e: {detail: {message: string, type: toast.ToastType, duration?: number}})
+    onNotification(e: {detail: Notification})
     {
         toast.toast({
             message: e.detail.message,
@@ -29,6 +30,7 @@ export class NotificationProvider
     @Listen("errorToast")
     onErrorToast(e: {detail: string})
     {
+        console.error(e.detail);
         return this.onNotification({detail: {
             message: e.detail,
             type: "is-danger"
@@ -38,6 +40,7 @@ export class NotificationProvider
     @Listen("warnToast")
     onWarnToast(e: {detail: string})
     {
+        console.warn(e.detail)
         return this.onNotification({detail: {
             message: e.detail,
             type: "is-warning"
@@ -47,6 +50,7 @@ export class NotificationProvider
     @Listen("successToast")
     onSuccessToast(e: {detail: string})
     {
+        console.log(e.detail);
         return this.onNotification({detail: {
             message: e.detail,
             type: "is-success"
@@ -56,6 +60,7 @@ export class NotificationProvider
     @Listen("infoToast")
     onInfoToast(e: {detail: string})
     {
+        console.info(e.detail);
         return this.onNotification({detail: {
             message: e.detail,
             type: "is-info"
