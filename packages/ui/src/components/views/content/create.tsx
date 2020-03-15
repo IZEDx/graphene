@@ -2,7 +2,7 @@ import { Component, h, State, Listen } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneEnumType, GrapheneInputObjectType, GrapheneListType } from "../../../libs/graphene";
-import { pascalCase } from "change-case";
+import { capitalCase } from "change-case";
 
 const preferredColumns = ["id", "name", "title", "url", "description"];
 const readOnlyColumns = ["id", "created_at", "updated_at"];
@@ -93,7 +93,7 @@ export class ContentCreate
                     </div>
                     <div class="level-item">
                         <p class="subtitle is-5">
-                            <strong>{pascalCase(this.definition.name)}</strong>
+                            <strong>{capitalCase(this.definition.name)}</strong>
                         </p>
                     </div>
                 </div>

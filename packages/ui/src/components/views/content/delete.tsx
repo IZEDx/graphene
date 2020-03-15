@@ -3,6 +3,7 @@ import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneQueryField, GrapheneObjectType, GrapheneListType } from "../../../libs/graphene";
 import { RouterHistory, injectHistory } from "@stencil/router";
+import { capitalCase } from "change-case";
 
 @Component({
     tag: 'content-delete',
@@ -62,7 +63,7 @@ export class ContentDelete
             </div>
             <div class="level">
                 <div class="level-item content">
-                    <p>Are you sure you want to delete {this.definition.name} with id {this.id}?</p>
+                    <p>Are you sure you want to delete {capitalCase(this.definition.name)} with id {this.id}?</p>
                 </div>
             </div>
             <div class="level">

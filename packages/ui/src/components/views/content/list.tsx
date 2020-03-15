@@ -1,6 +1,6 @@
 import { Component, h, Prop, State, Watch } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
-import { pascalCase } from "change-case";
+import { capitalCase } from "change-case";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneListType, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneType } from "../../../libs/graphene";
 import { GraphQLOutputType } from "graphql";
@@ -109,7 +109,7 @@ export class ContentList
                 <div class="level-left">
                     <div class="level-item content">
                         <h2>
-                            <strong>{pascalCase(this.listDef.name)}</strong>
+                            <strong>{capitalCase(this.listDef.name)}</strong>
                         </h2>
                         <p class="subtitle is-5">{ this.listDef.description }</p>
                     </div>

@@ -2,7 +2,7 @@ import { Component, h, Prop, State, Listen, Event, EventEmitter } from "@stencil
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneListType, GrapheneInputObjectType } from "../../../libs/graphene";
-import { pascalCase } from "change-case";
+import { capitalCase } from "change-case";
 import { RouterHistory, injectHistory } from "@stencil/router";
 
 @Component({
@@ -110,9 +110,9 @@ export class ContentEdit
             console.log(entry, this.entries);
             if (entry) return this.fieldMap[entry[0]].type.renderCell(entry[1]);
 
-            return `${pascalCase(this.definition.name)} (${this.params.id})`;
+            return `${capitalCase(this.definition.name)} (${this.params.id})`;
         }
-        return pascalCase(this.definition.name);
+        return capitalCase(this.definition.name);
     }
 
     render() 
