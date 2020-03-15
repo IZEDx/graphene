@@ -94,13 +94,13 @@ export class ContentView
             <content-create></content-create>
         );
 
-        if (this.isDelete) return (
+        if (this.isDelete && this.isList) return (
             <content-delete 
                 params={this.id ? {id: this.id} : undefined}
             ></content-delete>
         );
 
-        if (this.isEdit) return (
+        if (this.isEdit || !this.isList) return (
             <content-edit 
                 params={this.id ? {id: this.id} : undefined}
                 preferredColumns={preferredColumns} 
