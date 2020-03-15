@@ -1,16 +1,13 @@
 {
   "name": "graphene-cms",
   "scripts": {
-    "bootstrap": "npx lerna bootstrap",
-    "build": "npm run bootstrap && npx lerna run build",
-    "build:api": "cd ./packages/api && npm run build",
-    "build:ui": "cd ./packages/ui && npm run build",
+    "build": "npm run build:api & npm run build:ui",
+    "build:api": "cd ./api && npm run build",
+    "build:ui": "cd ./ui && npm run build",
     "dev": "npm run dev:ui & npm run dev:api",
-    "dev:api": "cd ./packages/api && npm run dev",
-    "dev:ui": "cd ./packages/ui && npm run dev",
-    "test": "npx lerna run test",
-    "start": "nodemon --watch packages/api/dist bin/graphene-cms.js",
-    "typesync": "npx typesync"
+    "dev:api": "cd ./api && npm run dev",
+    "dev:ui": "cd ./ui && npm run dev",
+    "start": "nodemon --watch api/dist bin/graphene-cms.js"
   },
   "dependencies": {
     "apollo-server-express": "^2.9.16",
@@ -28,7 +25,6 @@
     "graphql-import": "^1.0.0-beta.2",
     "graphql-import-node": "0.0.4",
     "graphql-request": "^1.8.2",
-    "inscrybmde": "^1.11.6",
     "jsonwebtoken": "^8.5.1",
     "object-hash": "^2.0.1",
     "reflect-metadata": "^0.1.13",
@@ -61,7 +57,6 @@
     "bulma-pageloader": "^0.3.0",
     "bulma-switch": "^2.0.0",
     "bulma-toast": "^1.5.4",
-    "lerna": "^3.20.2",
     "nodemon": "^2.0.2",
     "parcel": "^1.12.4",
     "rollup-plugin-node-polyfills": "^0.2.1",

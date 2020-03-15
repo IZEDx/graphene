@@ -1,5 +1,5 @@
 
-const graphene = require("../packages/api/dist");
+const graphene = require("../api/dist");
 
 console.log(graphene);
 graphene.GrapheneServer.create({

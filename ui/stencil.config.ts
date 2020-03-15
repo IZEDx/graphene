@@ -11,7 +11,7 @@ export const config: Config = {
       esmLoaderPath: '../loader',
     },
     {
-      type: "docs",
+      type: "docs-readme",
       dir: "docs",
     },
     {
