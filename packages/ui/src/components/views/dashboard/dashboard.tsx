@@ -22,9 +22,13 @@ export class DashboardView
     render()
     {
         return <util-guard>
-            <div class="content">
-                <h1>Welcome to Graphene</h1>
-            </div>
+            <segment class="segment">
+                <div class="container">
+                    <div class="box content has-blur-background">
+                        <h1>Welcome to Graphene</h1>
+                    </div>
+                </div>
+            </segment>
         </util-guard>;
     }
 } 
