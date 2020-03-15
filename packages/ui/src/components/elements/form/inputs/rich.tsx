@@ -23,6 +23,7 @@ export class GELInputRich
     componentWillLoad()
     {
         this._value = unescape(this.value);
+        if (!this._value || this._value === "undefined") this._value = "";
     }
 
     componentDidLoad()
