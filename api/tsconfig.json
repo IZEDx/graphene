@@ -5,13 +5,14 @@
       "declaration": true,
       "experimentalDecorators": true,
       "lib": [
+        "dom",
         "esnext"
       ],
       "moduleResolution": "node",
       "module": "esnext",
       "target": "es2017",
       "strict": true,
-      "outputDir": "dist",
+      "outDir": "dist",
       "emitDeclarationOnly": true,
       "strictPropertyInitialization": false,
       "emitDecoratorMetadata": true
@@ -21,7 +22,7 @@
     ],
     "exclude": [
       "node_modules",
-      "../node_modules"
+      "../node_modules/"
     ]
 }
   

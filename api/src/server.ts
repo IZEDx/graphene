@@ -16,7 +16,7 @@ import { UserRole } from './models/enums/UserRole';
 import cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { UserService } from './services/UserService';
-import { ColorfulChalkLogger, DEBUG } from "colorful-chalk-logger";
+import { colorConsole, Tracer } from "tracer";
 import GrapheneConfig from './models/GrapheneConfig';
 import GrapheneConfigResolver from './resolvers/grapheneConfig/GrapheneConfigResolver';
 
@@ -50,7 +50,7 @@ export interface GrapheneOptions
 
 export class GrapheneServer
 {
-    public logger: ColorfulChalkLogger;
+    public logger: Tracer.Logger;
     public options: GrapheneOptions;
     public schema: GraphQLSchema;
     public apollo: ApolloServer;
@@ -68,12 +68,16 @@ export class GrapheneServer
 
         Container.set("server", server);
         
-        server.logger = new ColorfulChalkLogger('graphene', {
-            level: DEBUG,   // the default value is INFO
-            date: false,    // the default value is false.
-            colorful: true, // the default value is true.
-            inline: true
-        }, process.argv);
+        server.logger = colorConsole({
+            level: "debug",
+            format: [
+                "{{timestamp}} graphene <{{title}}> {{message}}",
+                {
+                    error: '{{timestamp}} graphene <{{title}}> {{message}} (in {{file}}:{{line}})\nCall Stack:\n{{stack}}',
+                    warn: '{{timestamp}} graphene <{{title}}> {{message}} (in {{file}}:{{line}})'
+                }
+            ]
+        });
 
         Container.set("logger", server.logger);
 
@@ -89,18 +93,18 @@ export class GrapheneServer
             synchronize: true
         }, opts?.connection);
 
-        server.logger.verbose(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
+        server.logger.info(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
         server.orm = await createConnection(connectionConfig);
 
 
-        server.logger.verbose("Setting up express");
+        server.logger.info("Setting up express");
         server.express = express();
         
         server.express.use('*', cors()); 
         server.express.use(compression());
         server.express.use(cookieParser());
 
-        server.logger.verbose("Setting up jwt");
+        server.logger.info("Setting up jwt");
         server.express.use(jwt({ 
             secret: opts?.secret ?? "Graphene",
             credentialsRequired: false,
@@ -118,7 +122,7 @@ export class GrapheneServer
  
         server.clientConfig = new GrapheneConfig(opts?.inputRenderers ?? {}, opts?.cellRenderers ?? {})
  
-        server.logger.verbose("Setting up graphql");
+        server.logger.info("Setting up graphql");
 
         const resolvers = [UserResolver, ...(opts?.demoMode ? [await import('./resolvers/demoPage/DemoPageResolver')] : []), GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
         server.schema = await buildSchema({
@@ -139,7 +143,7 @@ export class GrapheneServer
         });
         server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
 
-        server.logger.verbose("Setting up ui");
+        server.logger.info("Setting up ui");
         server.express.use(express.static(www));
         server.express.use((req, res) => {
             readFile(indexHtml, (err, data) => {
@@ -147,7 +151,7 @@ export class GrapheneServer
             });
         });
 
-        server.logger.verbose("Checking for admin user");
+        server.logger.info("Checking for admin user");
         await this.createAdminUser(opts?.adminPassword);
 
         return server;

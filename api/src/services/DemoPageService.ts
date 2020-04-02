@@ -1,9 +1,9 @@
 import { Service, Inject } from "typedi";
 import { GrapheneServer } from "../server";
-import { ColorfulChalkLogger } from "colorful-chalk-logger";
 import DemoPage from "../models/DemoPage";
 import { CreatePageInput, EditPageInput } from "../resolvers/demoPage/DemoPageResolver";
 import User from "../models/User";
+import { Tracer } from "tracer";
 
 
 @Service()
@@ -11,7 +11,7 @@ export class DemoPageService
 {
 
     @Inject("server") server: GrapheneServer;
-    @Inject("logger") logger: ColorfulChalkLogger;
+    @Inject("logger") logger: Tracer.Logger;
 
     getAll()
     {

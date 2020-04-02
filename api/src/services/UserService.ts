@@ -7,7 +7,7 @@ import { compare, hash } from "../libs/bcrypt";
 import { passwordMask } from "../models/scalars/Password";
 import jwt from "jsonwebtoken";
 import { AuthChecker } from "type-graphql";
-import { ColorfulChalkLogger } from "colorful-chalk-logger";
+import { Tracer } from "tracer";
 
 
 @Service()
@@ -15,7 +15,7 @@ export class UserService
 {
 
     @Inject("server") server: GrapheneServer;
-    @Inject("logger") logger: ColorfulChalkLogger;
+    @Inject("logger") logger: Tracer.Logger;
 
     static AuthChecker: AuthChecker<GrapheneContext> = 
     async ({ root, args, context, info }, roles) => 
