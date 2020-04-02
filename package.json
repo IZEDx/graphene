@@ -7,6 +7,20 @@
   "collection": "ui/dist/collection/collection-manifest.json",
   "collection:main": "ui/dist/collection/index.js",
   "unpkg": "ui/dist/graphene-admin/graphene-admin.js",
+  "license": "MIT",
+  "homepage": "https://github.com/IZEDx/graphene#readme",
+  "bugs": { 
+    "url" : "https://github.com/IZEDx/graphene/issues"
+  },
+  "author": { 
+    "name" : "Niklas Kühtmann", 
+    "email" : "nk@ized.io", 
+    "url" : "https://github.com/IZEDx/"
+  },
+  "repository": {
+    "type" : "git",
+    "url" : "https://github.com/IZEDx/graphene.git"
+  },
   "scripts": {
     "build": "npm run build:api & npm run build:ui",
     "build:api": "cd ./api && npm run build",
@@ -16,6 +30,16 @@
     "dev:ui": "cd ./ui && npm run dev",
     "start": "nodemon --watch api/dist bin/graphene-cms.js"
   },
+  "files": [
+    "api/package.json",
+    "api/dist",
+    "ui/package.json",
+    "ui/LICENSE",
+    "ui/dist",
+    "ui/docs",
+    "ui/loader",
+    "ui/www"
+  ],
   "dependencies": {
     "apollo-server-express": "^2.9.16",
     "bcryptjs": "^2.4.3",
