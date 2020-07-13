@@ -10,10 +10,9 @@
       ],
       "moduleResolution": "node",
       "module": "esnext",
-      "target": "es2017",
+      "target": "es2015",
       "strict": true,
       "outDir": "dist",
-      "emitDeclarationOnly": true,
       "strictPropertyInitialization": false,
       "emitDecoratorMetadata": true
     },

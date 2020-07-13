@@ -4,8 +4,7 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "build": "rm -rf ./dist && npm run types && parcel build src/index.ts --out-dir dist --target node --no-minify",
-    "dev": "parcel watch src/index.ts --out-dir dist --target node",
-    "types": "../node_modules/typescript/bin/tsc"
+    "build": "rm -rf ./dist && ../node_modules/typescript/bin/tsc",
+    "dev": "parcel watch src/index.ts --out-dir dev --target node"
   }
 }

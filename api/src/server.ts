@@ -10,7 +10,7 @@ import { createConnection, Connection, EntitySchema, ConnectionOptions, useConta
 import { join } from "path";
 import User from './models/User';
 import { readFile } from 'fs';
-import jwt from "express-jwt";
+import jwt from "express-jwt"; 
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { UserRole } from './models/enums/UserRole';
 import cookieParser from "cookie-parser";
@@ -44,6 +44,7 @@ export interface GrapheneOptions
     customHead?: string;
     inputRenderers?: Record<string, string>;
     cellRenderers?: Record<string, string>;
+    hiddenContentTypes?: string[];
     demoMode?: boolean;
     authExpire?: number; // in days
 }
@@ -120,7 +121,11 @@ export class GrapheneServer
             }
         }));
  
-        server.clientConfig = new GrapheneConfig(opts?.inputRenderers ?? {}, opts?.cellRenderers ?? {})
+        server.clientConfig = new GrapheneConfig(
+            opts?.inputRenderers ?? {}, 
+            opts?.cellRenderers ?? {},
+            ["GrapheneConfig", ...(opts?.hiddenContentTypes ?? [])]
+        )
  
         server.logger.info("Setting up graphql");
 
@@ -152,27 +157,32 @@ export class GrapheneServer
         });
 
         server.logger.info("Checking for admin user");
-        await this.createAdminUser(opts?.adminPassword);
+        await server.createAdminUser(opts?.adminPassword);
 
         return server;
     }
 
 
-    private static async createAdminUser(overridePw?: string)
+    private async createAdminUser(overridePw?: string)
     {
         const userService = Container.get(UserService);
         let adminUser = await User.findOne({where: {name: "admin"}});
         if (!adminUser)
         {
             adminUser = await userService.create({name: "admin", role: UserRole.ADMIN, password: "admin"});
+            this.logger.info("Default admin user was created with password: \"admin\"");
+            this.logger.info("Please change your password after first login");
         }
         
         if (overridePw)
         {
-            userService.update(adminUser, {
+            adminUser = await userService.update(adminUser, {
                 password: overridePw
             });
+            this.logger.info("Admin password was overriden");
         }
+
+        return adminUser;
     }
 
 
