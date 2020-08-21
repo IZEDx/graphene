@@ -9,17 +9,17 @@
   "unpkg": "ui/dist/graphene-admin/graphene-admin.js",
   "license": "MIT",
   "homepage": "https://github.com/IZEDx/graphene#readme",
-  "bugs": { 
-    "url" : "https://github.com/IZEDx/graphene/issues"
+  "bugs": {
+    "url": "https://github.com/IZEDx/graphene/issues"
   },
-  "author": { 
-    "name" : "Niklas Kühtmann", 
-    "email" : "nk@ized.io", 
-    "url" : "https://github.com/IZEDx/"
+  "author": {
+    "name": "Niklas Kühtmann",
+    "email": "nk@ized.io",
+    "url": "https://github.com/IZEDx/"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/IZEDx/graphene.git"
+    "type": "git",
+    "url": "https://github.com/IZEDx/graphene.git"
   },
   "scripts": {
     "build": "npm run build:api & npm run build:ui",
@@ -93,7 +93,7 @@
     "rollup-plugin-node-polyfills": "^0.2.1",
     "stencil-quantum": "^1.0.0-alpha.15",
     "tinymce": "^5.2.0",
-    "typescript": "^3.8.3"
+    "typescript": "^3.9.7"
   },
   "peerDependencies": {
     "mssql": "^6.1.0",
