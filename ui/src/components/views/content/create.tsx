@@ -116,7 +116,7 @@ export class ContentCreate
                     </div>
                     <div class="level-item">
                         <p class="subtitle is-5">
-                            <strong>{capitalCase(this.definition.name)}</strong>
+                            <strong>New {capitalCase(this.definition.name)}</strong>
                         </p>
                     </div>
                 </div>
@@ -131,7 +131,7 @@ export class ContentCreate
                             disabled={this.isCreating}
                             onClick={() => this.onSave()}
                         >
-                            Create &nbsp; <ion-icon name="save"></ion-icon>
+                            Save &nbsp; <ion-icon name="save"></ion-icon>
                         </button>
                     </div>
                 </div>

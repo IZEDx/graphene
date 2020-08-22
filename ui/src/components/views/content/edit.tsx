@@ -41,7 +41,8 @@ export class ContentEdit
 
     get entryMap()
     {
-        return this.entries?.reduce((a, [k,v]) => ({...a, [k]: v})) ?? {};
+        console.log("ENTRIES", this.entries);
+        return this.entries?.reduce((a, [k,v]) => ({...a, [k]: v}), {}) ?? {};
     }
 
     @content.Observe("definition")
@@ -149,7 +150,7 @@ export class ContentEdit
                     
                     <div class="level-item">
                         <p class="subtitle is-5">
-                            <strong>{this.title}</strong>
+                            <strong>Edit {this.title}</strong>
                         </p>
                     </div>
                 </div>
