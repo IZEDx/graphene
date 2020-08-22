@@ -1,19 +1,20 @@
-import express, {Express} from 'express';
+import express = require("express");
+import depthLimit = require('graphql-depth-limit');
+import compression = require('compression');
+import cors = require('cors');
+import jwt = require("express-jwt"); 
+import cookieParser = require("cookie-parser");
+
 import { ApolloServer } from 'apollo-server-express';
-import depthLimit from 'graphql-depth-limit';
-import compression from 'compression';
-import cors from 'cors';
-import { buildSchema, AuthChecker } from 'type-graphql';
+import { buildSchema } from 'type-graphql'; 
 import { GraphQLSchema } from 'graphql';
 import UserResolver from './resolvers/user/UserResolver';
 import { createConnection, Connection, EntitySchema, ConnectionOptions, useContainer } from 'typeorm';
 import { join } from "path";
 import User from './models/User';
 import { readFile } from 'fs';
-import jwt from "express-jwt"; 
 import { ExpressContext } from 'apollo-server-express/dist/ApolloServer';
 import { UserRole } from './models/enums/UserRole';
-import cookieParser from "cookie-parser";
 import { Container } from "typedi";
 import { UserService } from './services/UserService';
 import { colorConsole, Tracer } from "tracer";
@@ -56,7 +57,7 @@ export class GrapheneServer
     public options: GrapheneOptions;
     public schema: GraphQLSchema;
     public apollo: ApolloServer; 
-    public express: Express;
+    public express: express.Express;
     public orm: Connection;
 
     public clientConfig: GrapheneConfig;
@@ -109,7 +110,7 @@ export class GrapheneServer
 
 
         server.logger.info("Setting up express");
-        server.express = express();
+        server.express = express(); 
         
         server.express.use('*', cors()); 
         server.express.use(compression());

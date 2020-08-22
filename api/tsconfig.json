@@ -14,7 +14,8 @@
       "strict": true,
       "outDir": "dist",
       "strictPropertyInitialization": false,
-      "emitDecoratorMetadata": true
+      "emitDecoratorMetadata": true,
+      "esModuleInterop": false
     },
     "include": [
       "src"
