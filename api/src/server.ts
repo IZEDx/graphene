@@ -146,7 +146,7 @@ export class GrapheneServer
         //#region GraphQL
         server.logger.info("Setting up graphql");
 
-        Container.set("userService", opts?.customUserService ?? UserService);
+        Container.set("userService", new (opts?.customUserService ?? UserService)());
         let resolvers = [opts?.customUserResolver ?? UserResolver, GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
         if (opts?.demoMode)
         {
