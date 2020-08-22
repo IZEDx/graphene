@@ -9,17 +9,17 @@
   "unpkg": "ui/dist/graphene-admin/graphene-admin.js",
   "license": "MIT",
   "homepage": "https://github.com/IZEDx/graphene#readme",
-  "bugs": { 
-    "url" : "https://github.com/IZEDx/graphene/issues"
+  "bugs": {
+    "url": "https://github.com/IZEDx/graphene/issues"
   },
-  "author": { 
-    "name" : "Niklas Kühtmann", 
-    "email" : "nk@ized.io", 
-    "url" : "https://github.com/IZEDx/"
+  "author": {
+    "name": "Niklas Kühtmann",
+    "email": "nk@ized.io",
+    "url": "https://github.com/IZEDx/"
   },
   "repository": {
-    "type" : "git",
-    "url" : "https://github.com/IZEDx/graphene.git"
+    "type": "git",
+    "url": "https://github.com/IZEDx/graphene.git"
   },
   "scripts": {
     "build": "npm run build:api & npm run build:ui",
@@ -28,7 +28,7 @@
     "dev": "npm run dev:ui & npm run dev:api",
     "dev:api": "cd ./api && npm run dev",
     "dev:ui": "cd ./ui && npm run dev",
-    "start": "nodemon --watch api/dist bin/graphene-cms.js"
+    "start": "nodemon --watch api/dev bin/graphene-cms.js"
   },
   "files": [
     "api/package.json",
@@ -78,7 +78,7 @@
     "@types/graphql": "^14.0.7",
     "@types/graphql-depth-limit": "^1.1.2",
     "@types/jsonwebtoken": "^8.3.7",
-    "@types/node": "^13.7.0",
+    "@types/node": "^14.6.0",
     "@types/nodemon": "^1.19.0",
     "@types/object-hash": "^1.3.1",
     "@types/sqlite3": "^3.1.6",
@@ -100,7 +100,7 @@
     "mysql": "^2.18.1",
     "pg": "^7.18.2",
     "sql.js": "^1.1.0",
-    "sqlite3": "^4.1.1"
+    "sqlite3": "^5.0.0"
   },
   "peerDependenciesMeta": {
     "mssql": {

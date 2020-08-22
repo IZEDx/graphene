@@ -22,6 +22,7 @@ export class ContentEdit
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @content.Context("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Context("listDef") listDef: GrapheneQueryField<GrapheneListType>;
@@ -101,7 +102,7 @@ export class ContentEdit
             this.isSaving = true;
             const result = await this.definition.edit<{id: string}>(this.entryMap);
             this.successToast.emit("Save successful");
-            this.history.push(`/${this.listDef.name}/${result.id}`);
+            this.history.push(`${this.baseUrl}/${this.listDef.name}/${result.id}`);
         }
         catch(e)
         {
@@ -112,7 +113,7 @@ export class ContentEdit
 
     async onDelete()
     {
-        this.history.push(`/${this.listDef.name}/${this.params?.id}/delete`);
+        this.history.push(`${this.baseUrl}/${this.listDef.name}/${this.params?.id}/delete`);
     }
 
     get title()
@@ -138,7 +139,7 @@ export class ContentEdit
                 <div class="level-left">
                     { !this.isList ? "" :
                         <div class="level-item">
-                            <stencil-route-link url={"/"+this.listDef.name}>
+                            <stencil-route-link url={this.baseUrl + "/"+this.listDef.name}>
                                 <button class="button is-white">
                                     <ion-icon name="chevron-back-outline"></ion-icon>
                                 </button>

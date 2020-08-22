@@ -43,10 +43,53 @@ body {
   height: 5px;
 }
 
+.dashboard-main
+{
+  .pageloader-body
+  {
+    opacity: 0;
+    transform: scale(1.1);
+    transition: transform 1s, opacity 5s ease-out;
+  }
+
+  &.visible
+  {
+    .pageloader-body
+    {
+      transform: scale(1);
+      opacity: 1;
+    }
+  } 
+}
+
 .dashboard-panel
 {
   //backdrop-filter: blur(15px);
   background-color: $background;
+
+  $time: 1s;
+  overflow-x: hidden;
+
+  opacity: 0;
+  max-width: 0;
+  transition: 
+    opacity $time ease-out, 
+    max-width $time ease-out, 
+    min-width $time ease-out, 
+    padding-right $time ease-out, 
+    padding-left $time ease-out;
+  
+  &.visible
+  {
+    opacity: 1;
+    max-width: 300px;
+  } 
+  &:not(.visible)
+  {
+    padding-right: 0;
+    padding-left: 0;
+    min-width: 0;
+  }
 }
 
 .dashboard-main.has-background
@@ -63,6 +106,7 @@ body {
 
 .box {
   border-radius: 0;
+  padding: 30px 40px 60px 40px;
 }
 
 .has-blur-background
@@ -72,7 +116,8 @@ body {
 
 .pageloader
 {
-  background-color: $body-background-color;
+  background-color: rgba($body-background-color, 0.5);
+  backdrop-filter: blur(15px);
 }
 
 

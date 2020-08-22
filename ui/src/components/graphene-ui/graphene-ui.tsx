@@ -1,5 +1,5 @@
 import { Component, Prop, h, Listen, State } from '@stencil/core';
-import { nav } from '../../global/context';
+import { graphene, nav } from '../../global/context';
 import "@stencil/router";
 
 @Component({
@@ -9,8 +9,10 @@ import "@stencil/router";
 export class GrapheneUI 
 {
     @Prop() endPoint: string;
+    @Prop() baseUrl = "/";
     @Prop() token?: string;
 
+    @graphene.Provide("connected") connected = false;
     @nav.Provide("isExpanded") isExpanded = false;
 
     @State() showBackground = false;
@@ -27,12 +29,13 @@ export class GrapheneUI
         const routeListener = (props: any) => <util-route-listener props={props} />;
 
         return this.wrapProviders(
-            <div class="dashboard is-full-height">
+            <div class={{"dashboard": true,  "is-full-height": true}}>
                 <graphene-nav></graphene-nav>
 
                 <div class={{
                     "dashboard-main": true,
-                    "has-background": this.showBackground
+                    "has-background": this.showBackground && this.connected,
+                    "visible": this.connected
                 }}>
                     <nav class="navbar">
                         <div class="navbar-brand">
@@ -52,13 +55,13 @@ export class GrapheneUI
                     }}>
                         <stencil-router >
                             <stencil-route-switch scrollTopOffset={0}>
-                                <stencil-route url="/login" component="view-login" routeRender={routeListener} />
-                                <stencil-route url="/logout" component="view-logout" routeRender={routeListener} />
-                                <stencil-route url="/:name/new" component="view-content" routeRender={routeListener}  componentProps={{isCreate: true}}/>
-                                <stencil-route url="/:name/:id/delete" component="view-content" routeRender={routeListener} componentProps={{isDelete: true}}/>
-                                <stencil-route url="/:name/:id" component="view-content" routeRender={routeListener}  componentProps={{isEdit: true}}/>
-                                <stencil-route url="/:name" component="view-content" routeRender={routeListener}/>
-                                <stencil-route url="/" component="view-dashboard" routeRender={routeListener} />
+                                <stencil-route url={`${this.baseUrl}/login`} component="view-login" routeRender={routeListener} />
+                                <stencil-route url={`${this.baseUrl}/logout`} component="view-logout" routeRender={routeListener} />
+                                <stencil-route url={`${this.baseUrl}/:name/new`} component="view-content" routeRender={routeListener}  componentProps={{isCreate: true}}/>
+                                <stencil-route url={`${this.baseUrl}/:name/:id/delete`} component="view-content" routeRender={routeListener} componentProps={{isDelete: true}}/>
+                                <stencil-route url={`${this.baseUrl}/:name/:id`} component="view-content" routeRender={routeListener}  componentProps={{isEdit: true}}/>
+                                <stencil-route url={`${this.baseUrl}/:name`} component="view-content" routeRender={routeListener}/>
+                                <stencil-route url={`${this.baseUrl}`} component="view-dashboard" routeRender={routeListener} />
                             </stencil-route-switch>
                         </stencil-router>
                     </div>
@@ -81,7 +84,7 @@ export class GrapheneUI
     {
         return (
             <notification-provider>
-                <graphene-provider endPoint={this.endPoint} token={this.token}>
+                <graphene-provider endPoint={this.endPoint} token={this.token} baseUrl={this.baseUrl}>
                     <breadcrumb-provider>
                         {jsx}
                     </breadcrumb-provider>

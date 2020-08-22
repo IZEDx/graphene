@@ -25,6 +25,7 @@ export class ContentView
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
     @graphene.Context("isAuthorized") isAuthorized: boolean;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @content.Provide("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Provide("listDef") listDef: GrapheneQueryField<GrapheneListType>;
@@ -64,8 +65,8 @@ export class ContentView
         this.isList = !!this.definition.asList().type.getType(GrapheneListType);
         this.listDef = this.isList ? this.definition.asList() : undefined;
 
-        this.pushBreadcrumb.emit([this.name, "/" + (this.listDef?.name ?? this.name)]);
-        if (this.id) this.pushBreadcrumb.emit([this.id, this.match.url]);
+        this.pushBreadcrumb.emit([this.name, this.baseUrl + "/" + (this.listDef?.name ?? this.name)]);
+        if (this.id) this.pushBreadcrumb.emit([this.id, this.baseUrl + this.match.url]);
 
         //console.log(this.definition.asList());
     }

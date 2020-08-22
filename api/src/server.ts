@@ -55,7 +55,7 @@ export class GrapheneServer
     public logger: Tracer.Logger;
     public options: GrapheneOptions;
     public schema: GraphQLSchema;
-    public apollo: ApolloServer;
+    public apollo: ApolloServer; 
     public express: Express;
     public orm: Connection;
 
@@ -88,12 +88,21 @@ export class GrapheneServer
             server.logger.info("Running in demo mode")
         }
 
+        let entities = (opts?.entities ?? []);
+        if (opts?.demoMode)
+        {
+            const demoPage = await import('./models/DemoPage');
+            entities = [...entities, (demoPage.default ?? demoPage) as any]
+        }
+
         const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [User, ...(opts?.demoMode ? [await import('./models/DemoPage')] : []), ...(opts?.entities ?? [])],
+            entities: [User, ...entities],
             synchronize: true
         }, opts?.connection);
+
+        console.log(connectionConfig.entities);
 
         server.logger.info(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
         server.orm = await createConnection(connectionConfig);
@@ -130,7 +139,12 @@ export class GrapheneServer
  
         server.logger.info("Setting up graphql");
 
-        const resolvers = [UserResolver, ...(opts?.demoMode ? [await import('./resolvers/demoPage/DemoPageResolver')] : []), GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
+        let resolvers = [UserResolver, GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
+        if (opts?.demoMode)
+        {
+            const demoResolver = await import('./resolvers/demoPage/DemoPageResolver');
+            resolvers = [...resolvers, demoResolver.default ?? demoResolver];
+        }
         server.schema = await buildSchema({
             resolvers: resolvers as any,
             emitSchemaFile: true,
@@ -141,21 +155,22 @@ export class GrapheneServer
         server.apollo = new ApolloServer({ 
             schema: server.schema,
             validationRules: [depthLimit(7)],
+            logger: server.logger,
             context: ({req, res}) => {
                 const user = (req as any).user ?? {};
                 //server.logger.debug("context user", user);
                 return { req, res, user } as GrapheneContext;
-            },
+            }, 
         });
 
         server.logger.info("Setting up admin ui");
-        server.express.use("/admin", express.static(www));
+        server.express.use("/admin", express.static(www, { index: "_" }));
         server.express.use("/admin", (req, res) => {
             readFile(indexHtml, (err, data) => {
-                res.send(data.toString()
+                const html = data.toString()
                     .replace("<!--CUSTOM_HEAD-->", opts?.customHead ?? "")
-                    .replace("<!--ENDPOINT-->", opts?.customEndpoint ?? "/graphql")
-                );
+                    .replace("/graphql", opts?.customEndpoint ?? "/graphql");  
+                res.send(html);
             });
         });
         server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });

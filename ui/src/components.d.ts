@@ -5,10 +5,10 @@
  * It contains typing information for all components that exist in this project.
  */
 import { HTMLStencilElement, JSXBase } from "@stencil/core/internal";
-import { LocationSegments, MatchResults, RouteRenderProps, RouterHistory, } from "@stencil/router";
-import { GrapheneObjectType, GrapheneQueryField, } from "./libs/graphene";
-import { ClassList, } from "./libs/utils";
-import { Category, MenuItem, } from "./components/elements/menu/model";
+import { LocationSegments, MatchResults, RouteRenderProps, RouterHistory } from "@stencil/router";
+import { GrapheneObjectType, GrapheneQueryField } from "./libs/graphene";
+import { ClassList } from "./libs/utils";
+import { Category, MenuItem } from "./components/elements/menu/model";
 export namespace Components {
     interface BreadcrumbProvider {
     }
@@ -17,11 +17,11 @@ export namespace Components {
     }
     interface ContentDelete {
         "history": RouterHistory;
-        "params": Record<string, string | number> | undefined;
+        "params": Record<string, string|number>|undefined;
     }
     interface ContentEdit {
         "history": RouterHistory;
-        "params": Record<string, string | number> | undefined;
+        "params": Record<string, string|number>|undefined;
         "preferredColumns": string[];
         "readonlyColumns": string[];
     }
@@ -48,17 +48,14 @@ export namespace Components {
         "disabled"?: boolean;
         "formKey": string;
         "label"?: string;
-        "options": {
-            name: string;
-            value: string;
-        }[];
-        "selectClass": string | Record<string, boolean>;
+        "options": {name: string, value: string}[];
+        "selectClass": string|Record<string, boolean>;
         "value"?: string;
     }
     interface GelInputSwitch {
         "disabled"?: boolean;
         "formKey": string;
-        "inputClass": string | Record<string, boolean>;
+        "inputClass": string|Record<string, boolean>;
         "label"?: string;
         "value"?: boolean;
     }
@@ -66,7 +63,7 @@ export namespace Components {
         "autoComplete": string;
         "disabled"?: boolean;
         "formKey": string;
-        "inputClass": string | Record<string, boolean>;
+        "inputClass": string|Record<string, boolean>;
         "label"?: string;
         "placeholder"?: string;
         "type": string;
@@ -85,17 +82,19 @@ export namespace Components {
         "columns": string[];
         "history": RouterHistory;
         "linkTo"?: (row: any) => any;
-        "order": "ASC" | "DESC";
+        "order": "ASC"|"DESC";
         "rows": any[];
         "sortBy": string;
     }
     interface GrapheneNav {
     }
     interface GrapheneProvider {
+        "baseUrl": string;
         "endPoint": string;
         "token"?: string;
     }
     interface GrapheneUi {
+        "baseUrl": string;
         "endPoint": string;
         "token"?: string;
     }
@@ -296,13 +295,13 @@ declare namespace LocalJSX {
         "history"?: RouterHistory;
         "onApiError"?: (event: CustomEvent<any>) => void;
         "onSuccessToast"?: (event: CustomEvent<string>) => void;
-        "params"?: Record<string, string | number> | undefined;
+        "params"?: Record<string, string|number>|undefined;
     }
     interface ContentEdit {
         "history"?: RouterHistory;
         "onApiError"?: (event: CustomEvent<any>) => void;
         "onSuccessToast"?: (event: CustomEvent<string>) => void;
-        "params"?: Record<string, string | number> | undefined;
+        "params"?: Record<string, string|number>|undefined;
         "preferredColumns"?: string[];
         "readonlyColumns"?: string[];
     }
@@ -323,48 +322,33 @@ declare namespace LocalJSX {
         "disabled"?: boolean;
         "formKey"?: string;
         "label"?: string;
-        "onInputUpdate"?: (event: CustomEvent<{
-            formKey: string;
-            value: any;
-        }>) => void;
+        "onInputUpdate"?: (event: CustomEvent<{formKey: string, value: any}>) => void;
         "value"?: string;
     }
     interface GelInputSelect {
         "disabled"?: boolean;
         "formKey"?: string;
         "label"?: string;
-        "onInputUpdate"?: (event: CustomEvent<{
-            formKey: string;
-            value: any;
-        }>) => void;
-        "options"?: {
-            name: string;
-            value: string;
-        }[];
-        "selectClass"?: string | Record<string, boolean>;
+        "onInputUpdate"?: (event: CustomEvent<{formKey: string, value: any}>) => void;
+        "options"?: {name: string, value: string}[];
+        "selectClass"?: string|Record<string, boolean>;
         "value"?: string;
     }
     interface GelInputSwitch {
         "disabled"?: boolean;
         "formKey"?: string;
-        "inputClass"?: string | Record<string, boolean>;
+        "inputClass"?: string|Record<string, boolean>;
         "label"?: string;
-        "onInputUpdate"?: (event: CustomEvent<{
-            formKey: string;
-            value: any;
-        }>) => void;
+        "onInputUpdate"?: (event: CustomEvent<{formKey: string, value: any}>) => void;
         "value"?: boolean;
     }
     interface GelInputText {
         "autoComplete"?: string;
         "disabled"?: boolean;
         "formKey"?: string;
-        "inputClass"?: string | Record<string, boolean>;
+        "inputClass"?: string|Record<string, boolean>;
         "label"?: string;
-        "onInputUpdate"?: (event: CustomEvent<{
-            formKey: string;
-            value: any;
-        }>) => void;
+        "onInputUpdate"?: (event: CustomEvent<{formKey: string, value: any}>) => void;
         "placeholder"?: string;
         "type"?: string;
         "value"?: string;
@@ -383,13 +367,14 @@ declare namespace LocalJSX {
         "columns"?: string[];
         "history"?: RouterHistory;
         "linkTo"?: (row: any) => any;
-        "order"?: "ASC" | "DESC";
+        "order"?: "ASC"|"DESC";
         "rows"?: any[];
         "sortBy"?: string;
     }
     interface GrapheneNav {
     }
     interface GrapheneProvider {
+        "baseUrl"?: string;
         "endPoint"?: string;
         "onErrorToast"?: (event: CustomEvent<string>) => void;
         "onSuccessToast"?: (event: CustomEvent<string>) => void;
@@ -397,6 +382,7 @@ declare namespace LocalJSX {
         "token"?: string;
     }
     interface GrapheneUi {
+        "baseUrl"?: string;
         "endPoint"?: string;
         "token"?: string;
     }
@@ -420,14 +406,12 @@ declare namespace LocalJSX {
         "onPushBreadcrumb"?: (event: CustomEvent<[string, string]>) => void;
     }
     interface ViewDashboard {
+        "onClearBreadcrumb"?: (event: CustomEvent<any>) => void;
         "onPushBreadcrumb"?: (event: CustomEvent<[string, string]>) => void;
     }
     interface ViewLogin {
         "onClearBreadcrumb"?: (event: CustomEvent<void>) => void;
-        "onLogin"?: (event: CustomEvent<{
-            name: string;
-            password: string;
-        }>) => void;
+        "onLogin"?: (event: CustomEvent<{name: string, password: string}>) => void;
         "onPushBreadcrumb"?: (event: CustomEvent<[string, string]>) => void;
     }
     interface ViewLogout {

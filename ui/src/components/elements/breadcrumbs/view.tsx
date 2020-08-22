@@ -23,13 +23,19 @@ export class GELBreadcrumbs
                     <li class={{
                         "is-active": idx === this.breadcrumbs.length - 1
                     }}>
-                        <stencil-route-link 
-                            anchorClass={mergeClass(this.anchorClass)}
-                            class="no-padding is-flex-stretch clickable" 
-                            url={b[1]}
-                        >
-                            {b[0]}
-                        </stencil-route-link>
+                        { b[2]
+                            ? <a href={b[1]} class={mergeClass("no-padding is-flex-stretch clickable", this.anchorClass)}>
+                                {b[0]}
+                            </a>
+                            : <stencil-route-link 
+                                anchorClass={mergeClass(this.anchorClass)}
+                                class="no-padding is-flex-stretch clickable" 
+                                url={b[1]}
+                                
+                            >
+                                {b[0]}
+                            </stencil-route-link>
+                        }
                     </li>
                 )) }
             </ul>

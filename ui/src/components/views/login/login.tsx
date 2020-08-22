@@ -16,6 +16,7 @@ export class LoginView
     @State() isLoading = false;
 
     @graphene.Context("api") api: GrapheneAPI;
+    @graphene.Context("baseUrl") baseUrl: string;
     form = {
         name: "",
         password: ""
@@ -24,7 +25,7 @@ export class LoginView
     componentWillLoad()
     {
         this.clearBreadcrumb.emit();
-        this.pushBreadcrumb.emit(["Login", "/login"]);
+        this.pushBreadcrumb.emit(["Login", this.baseUrl + "/login"]);
     }
 
     @graphene.Observe("isAuthorized")

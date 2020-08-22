@@ -1,6 +1,7 @@
 
 import { Component, h, Prop, Event, EventEmitter, Watch, State } from "@stencil/core";
 import tinymce from "tinymce";
+import { graphene } from "../../../../global/context";
 
 @Component({
     tag: 'gel-input-rich',
@@ -9,6 +10,8 @@ import tinymce from "tinymce";
 export class GELInputRich
 {
     @Event() inputUpdate: EventEmitter<{formKey: string, value: any}>;
+
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @Prop() formKey: string;
     @Prop({mutable: true}) label?: string;
@@ -31,7 +34,7 @@ export class GELInputRich
         tinymce.init({
             target: this.editorEl,
             plugins: "code",
-            base_url: "/assets/tinymce",
+            base_url: this.baseUrl + "/assets/tinymce",
             skin: 'oxide-dark',
             content_css: 'dark',
             menubar: false,

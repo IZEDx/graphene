@@ -19,6 +19,7 @@ export class ContentDelete
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @content.Context("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Context("listDef") listDef: GrapheneQueryField<GrapheneListType>;
@@ -43,7 +44,7 @@ export class ContentDelete
             this.isDeleting = true;
             await this.definition.delete(this.id);
             this.successToast.emit(`Deleted ${this.definition.name} with id ${this.id}`);
-            this.history.push(`/${this.listDef.name}/`);
+            this.history.push(`${this.baseUrl}/${this.listDef.name}/`);
         }
         catch(e)
         {
@@ -59,7 +60,7 @@ export class ContentDelete
             <div class="level is-mobile">
                 <div class="level-left">
                     <div class="level-item">
-                        <stencil-route-link url={`/${this.listDef.name}${this.params?.id ? "/"+this.params.id : ""}`}>
+                        <stencil-route-link url={`${this.baseUrl}/${this.listDef.name}${this.params?.id ? "/"+this.params.id : ""}`}>
                             <button class="button is-white">
                                 <ion-icon name="chevron-back-outline"></ion-icon>
                             </button>

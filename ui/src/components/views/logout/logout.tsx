@@ -11,13 +11,14 @@ export class LogoutView
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
     @Event() clearBreadcrumb: EventEmitter<void>;
     @Event() logout: EventEmitter<void>;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @State() isLoading = false;
 
     componentWillLoad()
     {
         this.clearBreadcrumb.emit();
-        this.pushBreadcrumb.emit(["Logout", "/logout"]);
+        this.pushBreadcrumb.emit(["Logout", this.baseUrl + "/logout"]);
     }
 
     @graphene.Observe("isAuthorized")

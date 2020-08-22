@@ -1,3 +1,3 @@
 
-export type Breadcrumbs = [string, string][]
+export type Breadcrumbs = [string, string, boolean?][]
 

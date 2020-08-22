@@ -5,8 +5,9 @@ import { Breadcrumbs } from "../components/elements/breadcrumbs/model";
 
 export const graphene = new Entanglement({
     api: qt<GrapheneAPI>(),
+    baseUrl: qt<string>(),
     graphene: qt<Graphene>(),
-    connected: qt<boolean>({default: false}),
+    connected: qt<boolean>({default: false, mutable: true}),
     apiDown: qt<boolean>({default: false}),
     isAuthorized: qt<boolean>({default: false}),
     token: qt<string|undefined>()

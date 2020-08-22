@@ -1,6 +1,6 @@
 import { Component, h, Prop, Watch, Listen, Event, EventEmitter } from "@stencil/core";
 import { graphene } from "../../global/context";
-import { Graphene } from "../../libs/graphene";
+import { Graphene, GrapheneQueryField, GrapheneType } from "../../libs/graphene";
 import { GrapheneAPI, APIQueries } from "../../global/api";
 import { API } from "../../libs/api";
 
@@ -15,18 +15,21 @@ export class GrapheneProvider
 
     @graphene.Provide("api") api: GrapheneAPI;
     @graphene.Provide("graphene") graphene: Graphene;
-    @graphene.Provide("connected") isConnected = false;
+    @graphene.Context("connected") isConnected = false;
     @graphene.Provide("token") _token: string;
+    @graphene.Provide("baseUrl") _baseUrl: string;
     @graphene.Provide("isAuthorized") isAuthorized = false;
     @graphene.Provide("apiDown") apiDown = false;
 
     @Prop() endPoint: string;
+    @Prop() baseUrl = "/";
     @Prop() token?: string;
     
-    @Watch("token")
+    @Watch("token") @Watch("baseUrl")
     async componentWillLoad()
     {
         this._token = this.token ?? localStorage.getItem("token");
+        this._baseUrl = this.baseUrl;
     }
 
 
@@ -60,9 +63,8 @@ export class GrapheneProvider
 
         try
         {
-            const result = await this.api.client.request(query);
-            const token = result?.login;
-            this._token = token || this._token;
+            const result = await this.api.client.request<{ login?: string }>(query);
+            this._token = result.login || this._token;
             this.successToast.emit("Login successful");
         }
         catch(e)
@@ -97,7 +99,7 @@ export class GrapheneProvider
     @graphene.Observe("token")
     async connectToAPI(token?: string)
     {
-        console.log("Connecting...", token);
+        console.log("Connecting to ", this.endPoint, token);
 
         this.isConnected = false;
         this.toggleBackground.emit(false);
@@ -131,9 +133,10 @@ export class GrapheneProvider
             }
         }
 
+        let meField: GrapheneQueryField<GrapheneType<any>>;
         try
         {
-            const meField = this.graphene.getQuery("me");
+            meField = this.graphene.getQuery("me");
 
             if (!meField) 
             {
@@ -142,7 +145,6 @@ export class GrapheneProvider
             }
             else
             {
-                this.isConnected = true;
                 const me = (await meField?.request())[meField?.name];
                 if (me) this.isAuthorized = true;
                 else this.isAuthorized = false;
@@ -152,6 +154,10 @@ export class GrapheneProvider
         {
             console.log(err)
             this.isAuthorized = false;
+        }
+        finally
+        {
+            if (meField) this.isConnected = true;
         }
 
         this.graphene = this.graphene; 

@@ -9,7 +9,7 @@
 */
 
 @charset "utf-8";
-
+ 
 @import "variables";
 @import "../../../node_modules/bulma/bulma.sass";
 @import "../../../node_modules/bulma-dashboard/src/bulma-dashboard.sass";   
@@ -20,4 +20,4 @@
 .pageloader.stop::after
 {
   animation: none;
-}
+}                             

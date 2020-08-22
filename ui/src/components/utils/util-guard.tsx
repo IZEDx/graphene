@@ -22,9 +22,11 @@ export class UtilGuard
             }}>
                 <span class="title">{this.apiDown ? "Can't connect!" : "Graphene"}</span>
             </div>
-            {this.isAuthorized ? "" : <view-login></view-login>}
-            <div style={this.isConnected && this.isAuthorized ? {} : {display: "none"}}>
-                <slot></slot>
+            <div class="pageloader-body" style={this.isConnected ? {} : {display: "none"}}>
+                {this.isAuthorized ? "" : <view-login></view-login>}
+                <div style={this.isAuthorized ? {}: {display: "none"}}>
+                    <slot></slot>
+                </div>
             </div>  
         </Host>
     }

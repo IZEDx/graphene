@@ -22,6 +22,7 @@ export class ContentCreate
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @content.Context("definition") definition: GrapheneQueryField<GrapheneObjectType>;
     @content.Context("listDef") listDef: GrapheneQueryField<GrapheneListType>;
@@ -91,7 +92,7 @@ export class ContentCreate
             const result = await this.definition.create(this.entries.reduce((a, [k,v]) => ({...a, [k]: v}), {}));
             console.log(result);
             this.successToast.emit("Creation successful");
-            this.history.push(`/${this.listDef.name}`);
+            this.history.push(`${this.baseUrl}/${this.listDef.name}`);
         }
         catch(e)
         {
@@ -107,7 +108,7 @@ export class ContentCreate
             <div class="level is-mobile">
                 <div class="level-left">
                     <div class="level-item">
-                        <stencil-route-link url={"/"+this.listDef.name}>
+                        <stencil-route-link url={this.baseUrl + "/"+this.listDef.name}>
                             <button class="button is-white">
                                 <ion-icon name="chevron-back-outline"></ion-icon>
                             </button>

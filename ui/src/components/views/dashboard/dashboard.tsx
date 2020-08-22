@@ -10,13 +10,16 @@ import { GrapheneAPI } from "../../../global/api";
 export class DashboardView 
 {
     @Event() pushBreadcrumb: EventEmitter<[string, string]>;
+    @Event() clearBreadcrumb: EventEmitter;
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("isAuthorized") isAuthorized: boolean;
+    @graphene.Context("baseUrl") baseUrl: string;
 
-    componentWillLoad()
+    componentDidLoad()
     {
-        this.pushBreadcrumb.emit([this.api.url, "/"]);
+        this.clearBreadcrumb.emit();
+        this.pushBreadcrumb.emit(["Dashboard", this.baseUrl]);
     }
 
     render()

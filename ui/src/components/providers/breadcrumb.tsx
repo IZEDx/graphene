@@ -10,13 +10,14 @@ import { Graphene } from "../../libs/graphene";
 export class BreadcrumbProvider 
 {
     @graphene.Context("graphene") graphene: Graphene;
-    @breadcrumb.Provide("breadcrumbs") breadcrumbs: Breadcrumbs = [["Dashboard", "/"]];
+    @graphene.Context("baseUrl") baseUrl: string;
+    @breadcrumb.Provide("breadcrumbs") breadcrumbs: Breadcrumbs = [];
     
     @graphene.Observe("graphene")
     async onGraphene()
     {
-        if (this.breadcrumbs) this.breadcrumbs[0] = [this.graphene?.api?.url, "/"];
-        else this.breadcrumbs = [[this.graphene?.api?.url, "/"]];
+        if (this.breadcrumbs) this.breadcrumbs = [[this.graphene?.api?.url, this.graphene?.api?.url, true], ...this.breadcrumbs.slice(1)];
+        else this.breadcrumbs = [[this.graphene?.api?.url, this.graphene?.api?.url, true]];
     }
 
     @Listen("pushBreadcrumb")

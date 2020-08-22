@@ -1,9 +1,9 @@
 
-const graphene = require("../api/dist");
+const graphene = require("../api/dev");
 
 console.log(graphene);
 graphene.GrapheneServer.create({
-    demoMode: true
+    demoMode: false,
 })
 .then(server => server.listen(1234))
 .then(() => {

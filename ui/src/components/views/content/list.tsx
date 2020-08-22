@@ -20,6 +20,7 @@ export class ContentList
 
     @graphene.Context("api") api: GrapheneAPI;
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("baseUrl") baseUrl: string;
 
     @content.Context("listDef") listDef: GrapheneQueryField<GrapheneListType>;
     @content.Context("canCreate") canCreate: boolean;
@@ -128,7 +129,7 @@ export class ContentList
                     </div>
                     <div class="level-item">
                         { !this.definition.createMutation ? "" : 
-                            <button class="button is-success" onClick={() => this.history.push(`/${this.listDef.name}/new`, {})}>
+                            <button class="button is-success" onClick={() => this.history.push(`${this.baseUrl}/${this.listDef.name}/new`, {})}>
                                 New &nbsp; <ion-icon name="add-outline"></ion-icon>
                             </button> 
                         }
@@ -142,7 +143,7 @@ export class ContentList
     linkTo(idx: number)
     {
         const id = this.values[idx]?.["id"];
-        return id && `/${this.listDef.name}/${id}`;
+        return id && `${this.baseUrl}/${this.listDef.name}/${id}`;
     }
 
 }

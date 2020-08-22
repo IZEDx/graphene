@@ -12,6 +12,7 @@ import { Graphene } from '../../libs/graphene';
 export class GrapheneNav 
 {
     @graphene.Context("graphene") graphene: Graphene;
+    @graphene.Context("baseUrl") baseUrl: string;
     @graphene.Context("connected") isConnected: boolean;
     @graphene.Context("isAuthorized") isAuthorized: boolean;
     @nav.Context("isExpanded") isExpanded: boolean;
@@ -33,15 +34,15 @@ export class GrapheneNav
                 items: [
                     {
                         name: "Dashboard",
-                        url: "/",
+                        url: this.baseUrl,
                         children: [],
                         exact: true
                     },
                     {
                         name: "Logout",
-                        url: "/logout",
+                        url: this.baseUrl + "/logout",
                         children: [],
-                        exact: true
+                        exact: false
                     }
                 ]
             },
@@ -52,7 +53,7 @@ export class GrapheneNav
                 .filter(f => !!f.editMutation)              
                 .map(({name}) => ({
                     name: capitalCase(name), 
-                    url: `/${name}`, 
+                    url: `${this.baseUrl}/${name}`, 
                     children: [], 
                     exact: false
                 }))
@@ -61,7 +62,7 @@ export class GrapheneNav
                 name: "Content",
                 items: this.graphene.queryLists.map(({name}) => ({
                     name: capitalCase(name), 
-                    url: `/${name}`, 
+                    url: `${this.baseUrl}/${name}`, 
                     children: [], 
                     exact: false
                 }))
@@ -70,8 +71,11 @@ export class GrapheneNav
     }
 
     render() {
-        return !this.isConnected || !this.isAuthorized ? "" : (
-            <div class={mergeClass("dashboard-panel is-scrollable is-medium", {"is-hidden-mobile": !this.isExpanded})}>
+        return  (
+            <div class={mergeClass("dashboard-panel is-scrollable is-medium", {
+                "is-hidden-mobile": !this.isExpanded, 
+                "visible": this.isConnected && this.isAuthorized,
+            })}>
                 <header class="dashboard-panel-header">
                     <div class="has-text-centered header content">
                         <h1 class="h1">Graphene</h1>
