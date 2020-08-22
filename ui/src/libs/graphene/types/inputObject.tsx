@@ -32,7 +32,8 @@ export class GrapheneInputObjectType extends GrapheneType
             .map(([k, v]) => {
                 const field = this.fieldMap[k];
                 console.log("lol field", field, field.isEnum());
-                let isString = !field.type.getType(GrapheneEnumType) && typeof field !== "number";
+                //const scalar = field.type.getType(GrapheneScalarType);
+                let isString = !field.type.getType(GrapheneEnumType) && typeof v !== "number" && typeof v !== "boolean";
                 return `${k}: ${isString ? `"${v}"` : v}`;
             });
 
@@ -66,6 +67,9 @@ export class GrapheneInputObjectType extends GrapheneType
 
     renderEdit(data: any, readonlyColumns: string[] = [])
     {
+        console.log("EDIT READONLY ", readonlyColumns);
+        console.log("EDIT DATA", data);
+
         return Object.entries(data)
         .filter(([key]) => !!this.fieldMap[key])
         .map(([key, value]) => {

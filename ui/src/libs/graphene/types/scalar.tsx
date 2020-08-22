@@ -26,7 +26,9 @@ export class GrapheneScalarType extends GrapheneType<GraphQLScalarType>
         switch(this.name)
         {
             case "DateTime": return new Date(val).toLocaleString();
-            case "Boolean": return val === "true" ? <ion-icon name="checkbox-outline"></ion-icon> : <ion-icon name="square-outline"></ion-icon>;
+            case "Boolean": return val === true || val === "true" 
+                ? <ion-icon name="checkbox-outline"></ion-icon> 
+                : <ion-icon name="square-outline"></ion-icon>;
             default: 
                 const renderer = this.graphene.cellRenderers[this.type.name];
                 if (renderer) return renderer(val);

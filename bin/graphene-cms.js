@@ -2,7 +2,7 @@
 const graphene = require("../api/dev");
 
 graphene.GrapheneServer.create({
-    demoMode: false,
+    demoMode: true,
 })
 .then(server => server.listen(1234))
 .then(() => {

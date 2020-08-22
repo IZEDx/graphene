@@ -23,4 +23,8 @@ export default class DemoPage extends BaseEntity
     @Field(type => User)
     @ManyToOne(type => User, { lazy: true })
     author: Lazy<User>;
+
+    @Field()
+    @Column()
+    visible: boolean;
 }    

@@ -13,6 +13,9 @@ export class CreatePageInput {
 
     @Field(type => RichContent)
     content: string;
+
+    @Field()
+    visible: boolean;
 }
 
 @InputType()
@@ -25,6 +28,9 @@ export class EditPageInput {
 
     @Field(type => RichContent)
     content: string;
+
+    @Field()
+    visible: boolean;
 }
 
 
@@ -39,7 +45,7 @@ export default class DemoPageResolver
     @Query(returns => [DemoPage])
     demoPages()
     {
-        return this.pageService.getAll();
+        return this.pageService.getAll(); 
     }
 
     @Query(() => DemoPage)
