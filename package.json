@@ -1,6 +1,6 @@
 {
   "name": "graphene-cms",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Graphene CMS",
   "main": "api/dist/index.js",
   "types": "api/dist",
