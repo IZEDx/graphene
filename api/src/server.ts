@@ -9,7 +9,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { buildSchema } from 'type-graphql'; 
 import { GraphQLSchema } from 'graphql';
 import UserResolver from './resolvers/user/UserResolver';
-import { createConnection, Connection, EntitySchema, ConnectionOptions, useContainer } from 'typeorm';
+import { createConnection, Connection, EntitySchema, ConnectionOptions, useContainer, BaseEntity } from 'typeorm';
 import { join } from "path";
 import User from './models/User';
 import { readFile } from 'fs';
@@ -35,7 +35,7 @@ export interface GrapheneContext extends ExpressContext
 
 export interface GrapheneOptions 
 {
-    entities?: EntitySchema<any>[];
+    entities?: (typeof BaseEntity)[];
     resolvers?: (string | Function)[];
     connection?: ConnectionOptions;
     port?: number;
@@ -93,7 +93,7 @@ export class GrapheneServer
         if (opts?.demoMode)
         {
             const demoPage = await import('./models/DemoPage');
-            entities = [...entities, (demoPage.default ?? demoPage) as any]
+            entities = [...entities, demoPage.default ?? demoPage]
         }
 
         const connectionConfig = Object.assign({
@@ -102,8 +102,6 @@ export class GrapheneServer
             entities: [User, ...entities],
             synchronize: true
         }, opts?.connection);
-
-        console.log(connectionConfig.entities);
 
         server.logger.info(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
         server.orm = await createConnection(connectionConfig);
