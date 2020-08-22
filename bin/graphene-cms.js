@@ -1,7 +1,6 @@
 
 const graphene = require("../api/dev");
 
-console.log(graphene);
 graphene.GrapheneServer.create({
     demoMode: false,
 })
