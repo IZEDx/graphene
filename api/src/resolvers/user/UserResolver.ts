@@ -3,30 +3,29 @@ import User from "../../models/User";
 import { CreateUserInput } from "./CreateUserInput";
 import { EditUserInput } from "./EditUserInput";
 import { LoginUserInput } from "./LoginUserInput";
-import { GrapheneContext } from "../../server";
-import { Service } from "typedi";
+import { GrapheneContext, GrapheneServer } from "../../server";
+import { Inject, Service } from "typedi";
 import { UserService } from "../../services/UserService";
 
 @Service()
 @Resolver(of => User)
 export default class UserResolver //implements ResolverInterface<User>
 {
-    constructor(
-        private readonly userService: UserService
-    ){}
+    @Inject("server") server: GrapheneServer;
+    @Inject("userService") userService: UserService;
 
     @Authorized("USER", "ADMIN")
     @Query(returns => [User])
     users()
     {
-        return User.find();
+        return this.userService.getAll();
     }
 
     @Authorized("USER", "ADMIN")
     @Query(() => User)
     user(@Arg("id") id: string) 
     {
-        return User.findOne({ where: { id } });
+        return this.userService.getOne(id);
     }
 
     @Authorized("ADMIN")
@@ -40,7 +39,7 @@ export default class UserResolver //implements ResolverInterface<User>
     @Mutation(() => User)
     async editUser(@Arg("data") data: EditUserInput) 
     {
-        const user = await User.findOne({ where: { id: data.id } });
+        const user = await this.userService.getOne(data.id);
         if (!user) throw new Error("User not found: " + data.id);
 
         return this.userService.update(user, data);
@@ -50,7 +49,7 @@ export default class UserResolver //implements ResolverInterface<User>
     @Mutation(() => User)
     async deleteUser(@Arg("id") id: string) 
     {
-        const user = await User.findOne({ where: { id } });
+        const user = await this.userService.getOne(id);
         if (!user) throw new Error("User not found: " + id);
 
         return user.remove();
@@ -60,17 +59,14 @@ export default class UserResolver //implements ResolverInterface<User>
     @Query(() => User)
     async me(@Ctx() context: GrapheneContext)
     {
-        const user = await User.findOne({ where: { id: context.user.id } });
-        if (!user) throw new Error("User not found: " + context.user.id);
-
-        return user; 
+        return this.userService.getOne(context.user.id!); 
     }
 
     @Authorized("USER", "ADMIN")
     @Mutation(() => User)
     async editMe(@Arg("data") data: EditUserInput, @Ctx() context: GrapheneContext) 
     {
-        const user = await User.findOne({ where: { id: context.user.id } });
+        const user = await this.userService.getOne(context.user.id!);
 
         return this.userService.update(user!, data);
     }
@@ -78,7 +74,7 @@ export default class UserResolver //implements ResolverInterface<User>
     @Mutation(() => String)
     async login(@Arg("data") data: LoginUserInput, @Ctx() context: GrapheneContext)
     {
-        const user = await User.findOne({ where: { name: data.name } });
+        const user = await this.userService.getOneByName(data.name);
         if (!user || !await this.userService.checkPassword(user, data.password)) throw new Error("Credentials invalid");
 
         return this.userService.authorize(user, context);

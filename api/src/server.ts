@@ -44,6 +44,9 @@ export interface GrapheneOptions
     adminPassword?: string;
     customHead?: string;
     customEndpoint?: string;
+    customUser?: typeof User;
+    customUserResolver?: typeof UserResolver;
+    customUserService?: typeof UserService;
     inputRenderers?: Record<string, string>;
     cellRenderers?: Record<string, string>;
     hiddenContentTypes?: string[];
@@ -66,11 +69,13 @@ export class GrapheneServer
 
     static async create(opts?: GrapheneOptions)
     {
+        //#region 
         const server = new GrapheneServer();
         server.options = opts ?? {};
-
         Container.set("server", server);
-        
+        //#endregion
+
+        //#region Logger
         server.logger = colorConsole({
             level: "debug",
             format: [
@@ -83,15 +88,13 @@ export class GrapheneServer
         });
 
         Container.set("logger", server.logger);
+        //#endregion
 
-        if (opts?.demoMode)
-        {
-            server.logger.info("Running in demo mode")
-        }
-
+        //#region TypeORM
         let entities = (opts?.entities ?? []);
         if (opts?.demoMode)
         {
+            server.logger.info("Running in demo mode");
             const demoPage = await import('./models/DemoPage');
             entities = [...entities, demoPage.default ?? demoPage]
         }
@@ -99,14 +102,15 @@ export class GrapheneServer
         const connectionConfig = Object.assign({
             type: "sqlite",
             database: "./db.sqlite3",
-            entities: [User, ...entities],
+            entities: [opts?.customUser ?? User, ...entities],
             synchronize: true
         }, opts?.connection);
 
         server.logger.info(`Connecting to ${connectionConfig.database}(${connectionConfig.type})`);
         server.orm = await createConnection(connectionConfig);
+        //#endregion
 
-
+        //#region Express
         server.logger.info("Setting up express");
         server.express = express(); 
         
@@ -129,16 +133,21 @@ export class GrapheneServer
                 return null;
             }
         }));
+        //#endregion
  
+        //#region Config
         server.clientConfig = new GrapheneConfig(
             opts?.inputRenderers ?? {}, 
             opts?.cellRenderers ?? {},
             ["GrapheneConfig", ...(opts?.hiddenContentTypes ?? [])]
         )
+        //#endregion
  
+        //#region GraphQL
         server.logger.info("Setting up graphql");
 
-        let resolvers = [UserResolver, GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
+        Container.set("userService", opts?.customUserService ?? UserService);
+        let resolvers = [opts?.customUserResolver ?? UserResolver, GrapheneConfigResolver, ...(opts?.resolvers ?? [])];
         if (opts?.demoMode)
         {
             const demoResolver = await import('./resolvers/demoPage/DemoPageResolver');
@@ -161,7 +170,10 @@ export class GrapheneServer
                 return { req, res, user } as GrapheneContext;
             }, 
         });
+        server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
+        //#endregion
 
+        //#region UI
         server.logger.info("Setting up admin ui");
         server.express.use("/admin", express.static(www, { index: "_" }));
         server.express.use("/admin", (req, res) => {
@@ -172,10 +184,12 @@ export class GrapheneServer
                 res.send(html);
             });
         });
-        server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
+        //#endregion
 
+        //#region Admin User
         server.logger.info("Checking for admin user");
         await server.createAdminUser(opts?.adminPassword);
+        //#endregion
 
         return server;
     }

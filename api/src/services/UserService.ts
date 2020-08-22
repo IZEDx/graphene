@@ -51,6 +51,21 @@ export class UserService
         return compare(password, user.password);
     }
 
+    getAll()
+    {
+        return User.find();
+    }
+
+    getOne(id: string)
+    {
+        return User.findOne({where: {id}});
+    }
+
+    getOneByName(name: string)
+    {
+        return User.findOne({where: {name}});
+    }
+
     async create(data: CreateUserInput)
     {
         Object.assign(data, {
