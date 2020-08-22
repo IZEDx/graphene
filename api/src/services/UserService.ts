@@ -5,7 +5,7 @@ import { EditUserInput } from "../resolvers/user/EditUserInput";
 import { CreateUserInput } from "../resolvers/user/CreateUserInput";
 import { compare, hash } from "../libs/bcrypt";
 import { passwordMask } from "../models/scalars/Password";
-import jwt from "jsonwebtoken";
+import jwt = require("jsonwebtoken");
 import { AuthChecker } from "type-graphql";
 import { Tracer } from "tracer";
 

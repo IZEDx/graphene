@@ -1,4 +1,4 @@
-import bcrypt from "bcryptjs";
+import bcrypt = require("bcryptjs");
 
 export const hash = (value: string, salt: string|number = 8) => 
     new Promise<string>((res, rej) => 
