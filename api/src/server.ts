@@ -42,6 +42,7 @@ export interface GrapheneOptions
     secret?: string;
     adminPassword?: string;
     customHead?: string;
+    customEndpoint?: string;
     inputRenderers?: Record<string, string>;
     cellRenderers?: Record<string, string>;
     hiddenContentTypes?: string[];
@@ -146,15 +147,18 @@ export class GrapheneServer
                 return { req, res, user } as GrapheneContext;
             },
         });
-        server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
 
-        server.logger.info("Setting up ui");
-        server.express.use(express.static(www));
-        server.express.use((req, res) => {
+        server.logger.info("Setting up admin ui");
+        server.express.use("/admin", express.static(www));
+        server.express.use("/admin", (req, res) => {
             readFile(indexHtml, (err, data) => {
-                res.send(data.toString().replace("<!--CUSTOM_HEAD-->", opts?.customHead ?? ""));
+                res.send(data.toString()
+                    .replace("<!--CUSTOM_HEAD-->", opts?.customHead ?? "")
+                    .replace("<!--ENDPOINT-->", opts?.customEndpoint ?? "/graphql")
+                );
             });
         });
+        server.apollo.applyMiddleware({ app: server.express, path: '/graphql' });
 
         server.logger.info("Checking for admin user");
         await server.createAdminUser(opts?.adminPassword);

@@ -1,6 +1,6 @@
 {
   "name": "graphene-cms",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Graphene CMS",
   "main": "api/dist/index.js",
   "types": "api/dist",
@@ -93,7 +93,7 @@
     "rollup-plugin-node-polyfills": "^0.2.1",
     "stencil-quantum": "^1.0.0-alpha.15",
     "tinymce": "^5.2.0",
-    "typescript": "^3.8.3"
+    "typescript": "latest"
   },
   "peerDependencies": {
     "mssql": "^6.1.0",
