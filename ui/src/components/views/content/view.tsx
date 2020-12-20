@@ -103,7 +103,7 @@ export class ContentView
 
         if (this.isEdit || !this.isList) return (
             <content-edit 
-                params={this.id ? {id: this.id} : undefined}
+                params={this.id ? {id: this.id} : !this.isList ? null : undefined}
                 preferredColumns={preferredColumns} 
                 readonlyColumns={readOnlyColumns}
             ></content-edit>

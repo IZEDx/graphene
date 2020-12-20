@@ -22,12 +22,12 @@
     "url": "https://github.com/IZEDx/graphene.git"
   },
   "scripts": {
-    "build": "npm run build:api & npm run build:ui",
-    "build:api": "cd ./api && npm run build",
-    "build:ui": "cd ./ui && npm run build",
-    "dev": "npm run dev:ui & npm run dev:api",
-    "dev:api": "cd ./api && npm run dev",
-    "dev:ui": "cd ./ui && npm run dev",
+    "build": "yarn run build:api & yarn run build:ui",
+    "build:api": "cd ./api && yarn run build",
+    "build:ui": "cd ./ui && yarn run build",
+    "dev": "yarn run dev:ui & yarn run dev:api",
+    "dev:api": "cd ./api && yarn run dev",
+    "dev:ui": "cd ./ui && yarn run dev",
     "start": "nodemon --watch api/dev bin/graphene-cms.js"
   },
   "files": [

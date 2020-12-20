@@ -133,6 +133,16 @@ export class GrapheneServer
                 return null;
             }
         }));
+        server.express.use((err: any, _req: any, _res: any, next: express.NextFunction) => {
+            console.error(err);
+            if (err?.name === 'UnauthorizedError') 
+            {
+                console.log("Invalid token", _req.user);
+                _req.user = {}
+                return next();
+            }
+            return next(err); 
+        });
         //#endregion
  
         //#region Config

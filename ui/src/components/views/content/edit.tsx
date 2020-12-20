@@ -1,4 +1,4 @@
-import { Component, h, Prop, State, Listen, Event, EventEmitter } from "@stencil/core";
+import { Component, h, Prop, State, Listen, Event, EventEmitter, Watch } from "@stencil/core";
 import { graphene, content } from "../../../global/context";
 import { GrapheneAPI } from "../../../global/api";
 import { Graphene, GrapheneObjectType, GrapheneQueryField, GrapheneField, GrapheneListType, GrapheneInputObjectType } from "../../../libs/graphene";
@@ -46,11 +46,12 @@ export class ContentEdit
     }
 
     @content.Observe("definition")
+    @Watch("params")
     async componentWillLoad()
     {
         try
         {
-            const object = (await this.definition.request(this.params))?.[this.definition.name];
+            const object = this.params === undefined ? {} : (await this.definition.request(this.params))?.[this.definition.name];
         
             this.editType = this.definition.editMutation.args.find(a => a.name === "data").type.getType(GrapheneInputObjectType);
 
