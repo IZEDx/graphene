@@ -55,7 +55,7 @@
     "graphql-import": "^1.0.0-beta.2",
     "graphql-import-node": "0.0.4",
     "graphql-request": "^1.8.2",
-    "jsonwebtoken": "^8.5.1",
+    "jsonwebtoken": "^9.0.0",
     "object-hash": "^2.0.1",
     "reflect-metadata": "^0.1.13",
     "ssha": "^1.0.1",
